@@ -7,14 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 
-login_manager = LoginManager()
-
 
 app = Flask(__name__)
 
 app.config.from_object(Config)
 db = SQLAlchemy(app)
-login_manager.init_app(app)
+login = LoginManager(app)
+login.login_view = 'login'
 
 from models import *
 from routes import *
@@ -32,9 +31,13 @@ def initdb():
 @app.cli.command()
 @click.argument('name')
 @click.argument('passwd')
-def create_user(name, passwd):
+def add_user(name, passwd):
     """Add new user account"""
     u = User(name=name)
     u.password_hash = generate_password_hash(passwd)
-    db.session.add(u)
-    db.session.commit()
+    try:
+        db.session.add(u)
+        db.session.commit()
+        print('User {} is added!'.format(name))
+    except Exception as err:
+        print(err)

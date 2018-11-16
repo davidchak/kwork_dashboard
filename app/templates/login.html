@@ -11,14 +11,26 @@
 <body>
     <div class="container">
         <div class="row">
+            
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+
             <form method="POST" action="/login">
+                {{ form.csrf_token }}
                 <div class="form-group">
                     {{ form.name.label }}
                     {{ form.name(size=20) }}
                 </div>
                 <div class="form-group">
-                    {{ form.passwd.label }}
-                    {{ form.passwd(size=20) }}
+                    {{ form.password.label }}
+                    {{ form.password(size=20) }}
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
