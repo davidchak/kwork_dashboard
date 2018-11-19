@@ -1,4 +1,4 @@
 {
-    "python.pythonPath": "/home/dchk09/dev/kwork_dashboard/venv/bin/python",
+    "python.pythonPath": "C:\\dev\\kwork_flask_api\\venv\\Scripts\\python.exe",
     "python.linting.pylintEnabled": false
 }

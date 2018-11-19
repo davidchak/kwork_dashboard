@@ -1,40 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-        crossorigin="anonymous">
-</head>
-<body>
-    <div class="container">
-        <div class="row">
-            
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-            <ul class=flashes>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endwith %}
+{% extends "base.html" %}
+{% block content %}
 
-            <form method="POST" action="/login">
-                {{ form.csrf_token }}
-                <div class="form-group">
-                    {{ form.name.label }}
-                    {{ form.name(size=20) }}
-                </div>
-                <div class="form-group">
-                    {{ form.password.label }}
-                    {{ form.password(size=20) }}
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+<div class="container">
+        
+    {% if message %}
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Ошибка</button>
+
+    <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+        {{ message }}
         </div>
     </div>
-</body>
-</html>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+        <h3 class="text-center mt-3 mb-5">Авторизация</h3>
+        {{ form.csrf_token }}
+        <div class="form-group">
+            {{ form.name(size=20, class="form-control", placeholder="Пользователь") }}
+        </div>
+        <div class="form-group">
+            {{ form.password(size=20, class="form-control", placeholder="Пароль") }}
+        </div>
+        <div class="row justify-content-end">
+            <button type="submit" class="btn btn-primary">Вход</button>
+        </div>
+    </form>
+        
+</div>
+
+
+{% endblock %}

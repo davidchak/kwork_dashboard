@@ -28,6 +28,15 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
     
 
+class Data(db.Model):
+
+    __tablename__ = 'data'
+
+    id = db.Column(db.Integer, primary_key = True)
+    datestamp = db.Column(db.String)
+    json = db.Column(db.String)
+
+
 class LoginForm(FlaskForm):
     name = StringField('name', validators=[Required()])
     password = PasswordField('password', validators=[Required()])
