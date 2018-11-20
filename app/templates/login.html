@@ -1,4 +1,19 @@
 {% extends "base.html" %}
+
+{% block header %}
+<style>
+    form {
+        margin: auto;
+        margin-top: 10%;
+        padding: 30px;
+        width: 400px;
+        border: 2px solid blueviolet;
+        border-radius: 1%;
+    }
+</style>
+<script> src="{{ url_for('static', filename='js/add_user.js') }}"</script>
+{% endblock %}
+
 {% block content %}
 
 <div class="container">

@@ -35,11 +35,31 @@ class Data(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     datestamp = db.Column(db.String)
     json = db.Column(db.String)
+    
+
+class Parser(db.Model):
+
+    __tablename__ = 'parsers'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String)
 
 
 class LoginForm(FlaskForm):
     name = StringField('name', validators=[Required()])
     password = PasswordField('password', validators=[Required()])
     submit = SubmitField('Login')
+
+
+class AddUserForm(FlaskForm):
+    name = StringField('name', validators=[Required()])
+    password = PasswordField('password', validators=[Required()])
+    submit = SubmitField('Add')
+
+
+class NewParserForm(FlaskForm):
+    name = StringField('name', validators=[Required()])
+    submit = SubmitField('Add')
+
 
 

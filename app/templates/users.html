@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+{% include 'menu.html' %}
+
+<div class="container">
+    
+    <form class="p-3" action="{{ url_for('get_users') }}" method="POST">
+        {{ form.csrf_token }}
+        <div class="row">
+            <div class="col">
+                {{ form.name(size=20, class="form-control", placeholder="Пользователь") }}
+            </div>
+            <div class="col">
+                {{ form.password(size=20, class="form-control", placeholder="Пароль") }}
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </div>
+        </div>
+    </form>
+
+    <div class="row pt-3 pb-3 m-2 dc-block">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <h5>Пользователи в базе:</h5>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                <tr id="row_{{ row.id }}">
+                    <th scope="row">{{ row.id }}</th>
+                    <td>{{ row.name }}</td>
+                    <td>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span onclick="del_user('{{ row.id }}')" aria-hidden="true">&times;</span>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}
