@@ -81,7 +81,6 @@ def del_user():
         return jsonify({'status': 'success'})
     else:
         return jsonify({'status': 'error'})
-    # return jsonify({'status': 'success', 'user_id': user_id})
 
 
 @app.route('/del_parser', methods=['POST'])
@@ -106,8 +105,10 @@ def get_data():
 
 @app.route('/api/set', methods=['POST'])
 def set_data():
-    data = request.get_json()
-    return jsonify({'status': 'success', 'data': data})
+    data = request.json['data']
+    if not data:
+        return jsonify({'status': 'error'})
+    return jsonify({'result': data})
 
 
 

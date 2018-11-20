@@ -35,6 +35,7 @@ class Data(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     datestamp = db.Column(db.String)
     json = db.Column(db.String)
+    parser_id = db.Column(db.Integer, db.ForeignKey('parsers.id'))
     
 
 class Parser(db.Model):
@@ -43,6 +44,7 @@ class Parser(db.Model):
 
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
+    data = db.relationship('Data', backref='parser', lazy='dynamic')
 
 
 class LoginForm(FlaskForm):
