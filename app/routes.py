@@ -98,16 +98,34 @@ def del_parser():
 
 
 # API
-@app.route('/api/get', methods=['GET','POST'])
+@app.route('/api/v1.0/get', methods=['GET','POST'])
 def get_data():
     return jsonify({'status': 'success'})
 
+@app.route('/api/v1.0/get_last/<count>', methods=['GET'])
+def get_last(count):
+    
+    data = db.session.query(Data).order_by(Data.id.desc()).limit(count)
+    print(data)
+    return jsonify({'status': 'success'})
 
-@app.route('/api/set', methods=['POST'])
+
+@app.route('/api/v1.0/set', methods=['POST'])
 def set_data():
-    data = request.json['data']
-    if not data:
-        return jsonify({'status': 'error'})
+    
+    data = request.json
+    result = Parser.query.filter_by(name = data['ID']).first()
+    
+    if not result:
+        return jsonify({'status': 'not found parser name'})
+    
+    d = Data()
+    d.datestamp = data['datestamp']
+    d.parser_id = data['ID']
+    d.json = str(data['json'])
+    db.session.add(d)
+    db.session.commit() 
+    
     return jsonify({'result': data})
 
 

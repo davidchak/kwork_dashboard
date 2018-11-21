@@ -35,3 +35,22 @@ function del_parser(id) {
         }
     )
 }
+
+function get_last_data() {
+    $.ajax({
+        data: {
+            id: id
+        },
+        type: 'POST',
+        url: '/del_parser'
+    }).done(
+        function (data) {
+            if (data.status === 'success') {
+                row_id = $('#row_' + id)
+                row_id.remove()
+            } else {
+                alert('Ошибка удаления парсера!')
+            }
+        }
+    )
+}
