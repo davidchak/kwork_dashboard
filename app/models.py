@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import Required
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from app import db, login, ma
+from app import db, login
 
 
 @login.user_loader
@@ -38,8 +38,6 @@ class Data(db.Model):
     parser_id = db.Column(db.Integer, db.ForeignKey('parsers.id'))
     
 
-
-
 class Parser(db.Model):
 
     __tablename__ = 'parsers'
@@ -47,16 +45,6 @@ class Parser(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
     data = db.relationship('Data', backref='parser', lazy='dynamic')
-
-
-class DataSchema(ma.ModelSchema):
-    class Meta:
-        model = Data    
-
-
-class ParserSchema(ma.ModelSchema):
-    class Meta:
-        model = Parser
 
 
 class LoginForm(FlaskForm):
