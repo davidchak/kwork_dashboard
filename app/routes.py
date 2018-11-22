@@ -104,10 +104,18 @@ def get_data():
 
 @app.route('/api/v1.0/get_last/<count>', methods=['GET'])
 def get_last(count):
-    
+    data_list = []
     data = db.session.query(Data).order_by(Data.id.desc()).limit(count)
-    print(data)
-    return jsonify({'status': 'success'})
+    for item in data:
+        new_item = {
+            'id': item.id,
+            'parser_id': item.parser_id,
+            'datestamp': item.datestamp,
+            'json': item.json
+        }
+        data_list.append(new_item)
+
+    return jsonify({'result': data_list})
 
 
 @app.route('/api/v1.0/set', methods=['POST'])
