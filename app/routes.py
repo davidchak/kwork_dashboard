@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, redirect, url_for, request, jsonify
+from flask import render_template, redirect, url_for, request, jsonify, abort
 from models import User, Data, Parser, LoginForm, AddUserForm, NewParserForm
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash
 from app import app, db
+from flask_security import login_required, current_user
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -140,3 +141,6 @@ def set_data():
 
     
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404

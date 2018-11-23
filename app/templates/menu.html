@@ -6,11 +6,13 @@
     <a class="navbar-brand" href="{{ url_for('dashboard') }}">Dashboard</a>
 
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+        
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            {% if current_user.has_role('admin') %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('get_users') }}">Пользователи</a>
             </li>
-
+            {% endif %}
         </ul>
         <div class="form-inline my-2 my-lg-0">
             <a class="btn btn-outline-success my-2 my-sm-0" href="{{ url_for('logout') }}">Выход</a>
