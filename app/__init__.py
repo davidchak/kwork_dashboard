@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
+from flask_principal import Principal
 
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
+principals = Principal(app)
 
 
 from models import *
@@ -24,6 +26,9 @@ from routes import *
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
+
+
+
 
 with app.app_context():
     db.create_all()

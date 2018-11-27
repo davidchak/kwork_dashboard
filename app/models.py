@@ -6,11 +6,13 @@ from wtforms.validators import Required
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_security import RoleMixin, UserMixin
 from app import db, login
+import time
 
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 
 roles_users = db.Table('roles_users',
@@ -29,6 +31,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), default=None)
     active = db.Column(db.Boolean)
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
+    last_login_at = db.Column(db.DateTime())
+    current_login_at = db.Column(db.DateTime())
+    last_login_ip = db.Column(db.String(100))
+    current_login_ip = db.Column(db.String(100))
+    login_count = db.Column(db.Integer)
+    clinets = db.relationship('Client', backref='user', lazy='dynamic')
+
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -60,6 +69,31 @@ class Parser(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
     data = db.relationship('Data', backref='parser', lazy='dynamic')
+
+
+class Client(db.Model):
+
+    __tablename__ = 'clients'
+
+    id =  id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String)
+    key = db.Column(db.String)
+    secret = db.Column(db.String)
+    life_marker = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def generate_key(self):
+        # TODO: сгенерировать ключ
+        self.key = r'$#5fdsf$%FDSF'
+
+    def generate_secret(self):
+        # TODO: сгенерировать сикрет
+        self.secret = r'%^$5t6fgdgd#@$@FDSFSDF' 
+
+    def extend_life_marker(self, count):
+        # TODO: продлить клиента
+        now = time.time()
+        self.life_marker = now + count
 
 
 class LoginForm(FlaskForm):

@@ -12,3 +12,4 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'das5fgff6h5g4h4d321fsdasdasdayuf78f753'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECURITY_TRACKABLE =True        # Flask-security
