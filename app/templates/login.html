@@ -1,17 +1,7 @@
 {% extends "base.html" %}
 
 {% block header %}
-<style>
-    form {
-        margin: auto;
-        margin-top: 10%;
-        padding: 30px;
-        width: 400px;
-        border: 2px solid blueviolet;
-        border-radius: 1%;
-    }
-</style>
-<script> src="{{ url_for('static', filename='js/add_user.js') }}"</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">  
 {% endblock %}
 
 {% block content %}
@@ -31,7 +21,8 @@
     {% endif %}
 
     <form method="POST" action="{{ url_for('login') }}">
-        <h3 class="text-center mt-3 mb-5">Авторизация</h3>
+        <!-- <img class="mb-4" src="../../assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"> -->
+        <!-- <h3 class="text-center mt-3 mb-5">Авторизация</h3> -->
         {{ form.csrf_token }}
         <div class="form-group">
             {{ form.name(size=20, class="form-control", placeholder="Пользователь") }}
@@ -39,9 +30,9 @@
         <div class="form-group">
             {{ form.password(size=20, class="form-control", placeholder="Пароль") }}
         </div>
-        <div class="row justify-content-end">
-            <button type="submit" class="btn btn-primary">Вход</button>
-        </div>
+        
+        <button type="submit" class="btn btn-md btn-primary btn-block">Вход</button>
+        <p class="mt-5 mb-3 text-center">© 2018</p>
     </form>
         
 </div>

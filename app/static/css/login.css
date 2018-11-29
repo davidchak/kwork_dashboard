@@ -1,0 +1,9 @@
+body {
+    background-color: #F5F5F5;
+}
+form {
+    margin: auto;
+    margin-top: 20%;
+    padding: 30px;
+    width: 400px;
+}

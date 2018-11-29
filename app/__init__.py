@@ -2,13 +2,12 @@
 
 from flask import Flask
 import click
-from config import Config
+from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
-from flask_principal import Principal
 
 
 app = Flask(__name__)
@@ -17,18 +16,13 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
-principals = Principal(app)
-
 
 from models import *
-from routes import *
-
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
 
-
-
+from routes import *
 
 with app.app_context():
     db.create_all()
@@ -43,9 +37,9 @@ def initdb():
     u1 = user_datastore.create_user(name='admin')
     u1.password_hash = generate_password_hash('admin')
     r1 = user_datastore.create_role(name='admin')
-    u2 = user_datastore.create_user(name='manager')
-    u2.password_hash = generate_password_hash('manager')
-    r2 = user_datastore.create_role(name='manager')
+    u2 = user_datastore.create_user(name='moderator')
+    u2.password_hash = generate_password_hash('moderator')
+    r2 = user_datastore.create_role(name='moderator')
 
     try:
         db.session.commit()

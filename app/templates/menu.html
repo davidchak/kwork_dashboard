@@ -3,17 +3,16 @@
         aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <a class="navbar-brand" href="{{ url_for('dashboard') }}">Dashboard</a>
-
+    {% if current_user.has_role('admin') %}
+        <a class="navbar-brand" href="{{ url_for('get_admin_page', username=current_user.name) }}">Admin</a>
+    {% else %}
+        <a class="navbar-brand" href="{{ url_for('get_moderator_page',  username=current_user.name) }}">Moderator</a>
+    {% endif %}
+    
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         
-        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-            {% if current_user.has_role('admin') %}
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('get_users') }}">Пользователи</a>
-            </li>
-            {% endif %}
-        </ul>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
+            
         <div class="form-inline my-2 my-lg-0">
             <a class="btn btn-outline-success my-2 my-sm-0" href="{{ url_for('logout') }}">Выход</a>
         </div>
