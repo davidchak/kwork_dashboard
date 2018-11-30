@@ -13,6 +13,7 @@ import time
 def load_user(id):
     return User.query.get(int(id))
 
+
 roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
         db.Column('role_id', db.Integer, db.ForeignKey('role.id'))
@@ -29,12 +30,12 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), default=None)
     active = db.Column(db.Boolean)
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
-    last_login_at = db.Column(db.DateTime())
-    current_login_at = db.Column(db.DateTime())
-    last_login_ip = db.Column(db.String(100))
-    current_login_ip = db.Column(db.String(100))
-    login_count = db.Column(db.Integer)
     clinets = db.relationship('Client', backref='user', lazy='dynamic')
+    # last_login_at = db.Column(db.DateTime())
+    # current_login_at = db.Column(db.DateTime())
+    # last_login_ip = db.Column(db.String(100))
+    # current_login_ip = db.Column(db.String(100))
+    # login_count = db.Column(db.Integer)
 
 
     def set_password(self, password):

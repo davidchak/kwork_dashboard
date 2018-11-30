@@ -4,9 +4,9 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     {% if current_user.has_role('admin') %}
-        <a class="navbar-brand" href="{{ url_for('get_admin_page', username=current_user.name) }}">Admin</a>
+        <a class="navbar-brand" href="{{ url_for('dashboard.get_admin_page', username=current_user.name) }}">Admin</a>
     {% else %}
-        <a class="navbar-brand" href="{{ url_for('get_moderator_page',  username=current_user.name) }}">Moderator</a>
+        <a class="navbar-brand" href="{{ url_for('dashboard.get_moderator_page',  username=current_user.name) }}">Moderator</a>
     {% endif %}
     
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
@@ -14,7 +14,7 @@
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>
             
         <div class="form-inline my-2 my-lg-0">
-            <a class="btn btn-outline-success my-2 my-sm-0" href="{{ url_for('logout') }}">Выход</a>
+            <a class="btn btn-outline-success my-2 my-sm-0" href="{{ url_for('auth.logout') }}">Выход</a>
         </div>
     </div>
 </nav>

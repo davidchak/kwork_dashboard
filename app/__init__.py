@@ -1,76 +1,56 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
-import click
+
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from werkzeug.security import generate_password_hash
 from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
+import cli
 
 
-app = Flask(__name__)
 
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-login = LoginManager(app)
-login.login_view = 'login'
-
-from models import *
-
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore)
-
-from routes import *
-
-with app.app_context():
-    db.create_all()
+db = SQLAlchemy()
+login = LoginManager()
+login.login_view = 'auth.login'
+security = Security()
 
 
-@app.cli.command()
-def initdb():
-    """Initialize the database."""
-    db.drop_all()
-    db.create_all()
 
-    u1 = user_datastore.create_user(name='admin')
-    u1.password_hash = generate_password_hash('admin')
-    r1 = user_datastore.create_role(name='admin')
-    u2 = user_datastore.create_user(name='moderator')
-    u2.password_hash = generate_password_hash('moderator')
-    r2 = user_datastore.create_role(name='moderator')
-
-    try:
-        db.session.commit()
-    except Exception as err:
-        db.session.rollback()
-        print('Error: ', err)
+def create_app():
     
-    user_datastore.add_role_to_user(u1, r1)
-    user_datastore.add_role_to_user(u2, r2)
-    
-    try:
-        db.session.commit()
-    except Exception as err:
-        db.session.rollback()
-        print('Error: ', err)
-    print('Init DB: Success!')
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    db.init_app(app)
+    login.init_app(app)
+
+    from .auth import auth as auth_bp
+    app.register_blueprint(auth_bp)
+
+    from .dashboard import dashboard as dashboard_bp
+    app.register_blueprint(dashboard_bp)
+
+    from .api import api as api_bp
+    app.register_blueprint(api_bp)
+
+    # Flask-security
+    from .models import User, Role
+    app.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    security.init_app(app, app.user_datastore)
+
+    with app.app_context():
+        db.create_all()
+  
+    cli.register(app)
+
+    return app
+
+from app import models
 
 
 
 
-@app.cli.command()
-@click.argument('name')
-@click.argument('passwd')
-def adduser(name, passwd):
-    """Add new user account"""
-    u = user_datastore.create_user(name=name)
-    u.password_hash = generate_password_hash(passwd)
-    try:
-        db.session.add(u)
-        db.session.commit()
-        print('User {} is created!'.format(name))
-    except Exception as err:
-        db.session.rollback()
-        print('Error: ', err)
+
+

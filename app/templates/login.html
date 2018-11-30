@@ -20,9 +20,13 @@
     </div>
     {% endif %}
 
-    <form method="POST" action="{{ url_for('login') }}">
+    <form method="POST" action="{{ url_for('auth.login') }}">
         <!-- <img class="mb-4" src="../../assets/brand/bootstrap-solid.svg" alt="" width="72" height="72"> -->
         <!-- <h3 class="text-center mt-3 mb-5">Авторизация</h3> -->
+        <div class="col text-center">
+            <img class="mb-4" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAVCSURBVHhe7Z156BRlHIc3K01Uwqy0TKHspJPUJCwKtSgC/witsAsqgiQqKzIoqAipiKKCCjsw6o/qnw7IxO6boiIs6MJAu9SkzG6zw88zw2vLMnvNTLuvs58HHtx5+e3s7PvuzPu+3/c7Y80YY4wxxhhjjDHGGGOMMcYYYyrFaLld+tL0kx3lMvmD/EzuJU0fmS1flkPkLfImafrIMfITebh8Ql4pTZ+5Wn4kH5TDKTC9hQ7cRMDR8lNJB/6dPEeaPsFZ8a08Kdmq1faXq+W0ZMv0HEZTT6cvt0Lf4VFVn5gpX09fbuVWeW360vSaofJDyRlxiDxPrpMTpekTu8v7JUPcJ+Wh0hhjIoFL1D4FnCBNCYQJ4L8luF56AlkAJoBUIpXJKOqLAn4p2c/f0hPInDABpBJDSL0ohOTZnyeQOWECSAUSUme+kdU3YH3/sIfcLX2ZEPqe/SQhefbnCWROwgSQSmznVXK6/EdulgfK4yWXqPq/+0l6AlmAMAH8WlKhG2Vj//C5PFVyFnwsV8ix8iBJ0JH3ERX2BLJELpJU7D3JVufkfZ9pgxskMtwgkeEGiQw3SGS4QSLDDRIZbpDIcINEhhskMtwgkXGDpGLvTrY65wLJ+55Jtkwp7C1/kVTsKRR0AaH5nyXvZX3FFIQ7oZ6TVOijFOTgEsn7v5E7U2DyQxIclclSLqH4PLDa+KZkP4TyTU5Y/WMdg4o8k4ICsGD1h2QBawYFpnvCkuvSZKs410j2t1KOoMB0zhxJ5bHkWtbNm9wU+oFkv7dRYDpjF7lGUnGLJEkKO8kymCxZc/9LHkWBac9Dksag/wjr5pfKTuFMGJm+zORmyf5J1CaRwrTgREll/SZJWugW5h3cXfWjnEVBBpxtJEbwOddTYLLhV71KUlGk9eThNPmavEPeTkETjpWMuDZJcr5MBndJGoNREGdHnr6DRuV2t7fkARS0gDAMn/eO3J4C8x8kuZHURodbn3PVTd/RjGZ9yigZcn4vp8CkDJOki1IxN1JQIlQ0Q2cS7B6WjWfCyZLPJVY2iQKTDm2pFLITyTYMObtFh7qHSTIXyWJkX8/LC2Ujj0g+/0U58E8ROkL+Kblc1V+qyrhc0cE/nr5MWCCzOvoxktsdaBTC9QPLDvI9SUXcSUHJjJdrJWH3cOMPl6gsTpccB8PlPSkYRBZKKoFILpeXMmfkATLgX5Hvy/MpaMFTkuNpfCjBQMDjMH6XzAXKvEwVgTNjg6RROGMGBjpOJm988SUURARnEcdFn7IrBYPAfMmXJoAY2+OV+LG8IDk+Rl+Vh1gT8wK+8BUyDHFj8gTJBJVjbDYIqAzPSr4oz7iq7ztiM8zg+ZcZfSU5S/Ilv5fjKOgB7ULxgca/Y0b/tuR4K5nTRYJCuOf8XAoK0q6iuROXSSEpQIRNSHJoFtVtFrI/WBINZiRIdLhSLJY0xvJkqxjt1jzIMnlVskzLvIbtsyWhGWbljbQK2V8nOW5uJK1MWIVKYMGJjnJfCgrSbs1jqsyqQH4U5Gg10ipkz4piuJO32YLXNgdpN3yhl5Kt4rSqQJgr62NYgWaxrHbw5AeOn6yVSjBP8oUeS7b+f4gCfCUbU30Y4XHp6paQ+ViZzj2cIVxGesW9kmekHCePlA/IdyWDgW65T1bqDOEJ0yFG1G2ydF7oyC+WdO5ElLns5EmOYwAREr2nUFAVQmT3V3mZZEiZNUuORdb0z5ChQ69cBJiJVliZ29bkDKt/wlClIEWU/+ODvKiskEVMviEZmTmZzhhjjDHGGGOMMcYYY4wxpjRqtS17TesN5+Zs5gAAAABJRU5ErkJggg==">
+        </div>
+            
         {{ form.csrf_token }}
         <div class="form-group">
             {{ form.name(size=20, class="form-control", placeholder="Пользователь") }}

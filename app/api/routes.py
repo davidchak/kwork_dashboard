@@ -1,62 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template, redirect, url_for, request, jsonify, abort, Response
-from flask_login import login_user, logout_user
-from werkzeug.security import generate_password_hash
-from flask_security import login_required, current_user, roles_required, roles_accepted
-from .models import User, Data, Parser, LoginForm, AddUserForm, NewParserForm, Client
-from . import app, db, user_datastore
+from flask_security import login_required, roles_required, roles_accepted, current_user
+from . import api
 
-############################################################################################################
-#     ROUTES
-############################################################################################################
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():  
-    
-    form = LoginForm()
-    message = ''
-    
-    if form.validate_on_submit():
-        user = User.query.filter_by(name=form.name.data.lower()).first()
-    
-        if user is None or not user.check_password(form.password.data):
-            message = u'Проверите правильность ввода логина или пароля!'
-    
-            return redirect(url_for('login'))
-    
-        login_user(user)
- 
-        if current_user.has_role('admin'):
-            return redirect(url_for('get_admin_page', username=user.name))
-        elif current_user.has_role('moderator'):
-            return redirect(url_for('get_moderator_page', username=user.name))
-    
-    return render_template('login.html', form = form)
-
-
-# Выход
-@app.route("/logout")
-def logout():
-    
-    logout_user()
-    return redirect(url_for('login'))
-
-
-# Админка
-@app.route('/admin_panel/<username>', methods=['GET', 'POST'])
-@roles_required('admin')
-def get_admin_page(username):
-
-    return render_template('admin.html')
-
-
-# Модераторка
-@app.route('/moderator_panel/<username>', methods=['GET', 'POST'])
-@roles_required('moderator')
-def get_moderator_page(username):
-    
-    return render_template('moderator.html')
 
 
 
@@ -88,13 +34,13 @@ api_resp = {
     'url': '',     
     'method': '',                 
     'success': True,                 
-    'resp_data': ''               
+    'resp_data': '',               
     'error': ''                
 }
 
 
 # Добавление пользователя 
-@app.route('/api/v1.0/add_user', methods=['POST'])
+@api.route('/api/v1.0/add_user', methods=['POST'])
 @roles_required('admin')
 def add_user(username, password, role):
 
@@ -133,63 +79,63 @@ def add_user(username, password, role):
 
 
 # Удаление пользователя 
-@app.route('/api/v1.0/del_user', methods=['POST'])
+@api.route('/api/v1.0/del_user', methods=['POST'])
 @roles_required('admin')
 def del_user(username):
     pass
 
 
 # Добавление парсера 
-@app.route('/api/v1.0/add_parser', methods=['POST'])
+@api.route('/api/v1.0/add_parser', methods=['POST'])
 @roles_required('admin')
 def add_parser():
     pass
 
 
 # Удаление парсера 
-@app.route('/api/v1.0/del_parser', methods=['POST'])
+@api.route('/api/v1.0/del_parser', methods=['POST'])
 @roles_required('admin')
 def del_parser(pansername):
     pass
 
 
 # Добавление клиента 
-@app.route('/api/v1.0/add_client', methods=['POST'])
+@api.route('/api/v1.0/add_client', methods=['POST'])
 @roles_accepted('admin', 'moderator')
 def add_client():
     pass
 
 
 # Удаление клиента 
-@app.route('/api/v1.0/del_client', methods=['POST'])
+@api.route('/api/v1.0/del_client', methods=['POST'])
 @roles_accepted('admin', 'moderator')
 def del_client(clientname):
     pass
 
 
 # Получение n-последних записей парсера
-@app.route('/api/v1.0/parser/get_last_query/<int:count>', methods=['POST'])
+@api.route('/api/v1.0/parser/get_last_query/<int:count>', methods=['POST'])
 @roles_required('admin')
 def get_last_query(count):
     pass
 
 
 # Получение количества зарег. парсеров
-@app.route('/api/v1.0/parser/get_count', methods=['POST'])
+@api.route('/api/v1.0/parser/get_count', methods=['POST'])
 @roles_required('admin')
 def get_parsers_count():
     pass
 
 
 # Получение количества зарег. модераторов
-@app.route('/api/v1.0/moderator/get_count', methods=['POST'])
+@api.route('/api/v1.0/moderator/get_count', methods=['POST'])
 @roles_required('admin')
 def get_moderators_count():
     pass
 
 
 # Получение количества зарег. клиентов 
-@app.route('/api/v1.0/client/get_count', methods=['POST'])
+@api.route('/api/v1.0/client/get_count', methods=['POST'])
 @roles_accepted('admin', 'moderator')
 def get_clients_count():
     pass
@@ -298,20 +244,3 @@ def get_clients_count():
 #     return jsonify({'result': data})
 
 
-
-
-############################################################################################################
-#     ERRORS
-############################################################################################################
-# TODO: Зарегистрировать страницу ошибки 404
-# TODO: Зарегистрировать страницу ошибки 500
-
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500

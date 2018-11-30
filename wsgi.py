@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-#=====================================================
-#                                                    #
-#        Autor:  dchk09 <davidchak@yandex.ru>        #
-#        Date:   16.11.2018                          #
-#                                                    #
-#=====================================================
+from app import create_app, db
+from app.models import Client, Data, Parser, Role, User
 
-from app import app
+app = create_app()
+
+
+@app.shell_context_processor
+def make_shell_context():
+    return {'db': db, 'User': User, 'Client': Client, 'Data': Data,
+            'Parser': Parser, 'Role': Role}
+
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
