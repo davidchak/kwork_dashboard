@@ -7,6 +7,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_security import RoleMixin, UserMixin
 from app import db, login
 import time
+import base64
+from datetime import datetime, timedelta
+import os
 
 
 @login.user_loader
@@ -24,18 +27,38 @@ class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True, index=True)
     name = db.Column(db.String(20), unique=True, index=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), default=None)
     active = db.Column(db.Boolean)
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
     clinets = db.relationship('Client', backref='user', lazy='dynamic')
-    # last_login_at = db.Column(db.DateTime())
+    last_login_at = db.Column(db.DateTime())
+    last_logout_at = db.Column(db.DateTime())
     # current_login_at = db.Column(db.DateTime())
     # last_login_ip = db.Column(db.String(100))
     # current_login_ip = db.Column(db.String(100))
-    # login_count = db.Column(db.Integer)
+
+
+    def _update_last_login_time(self):
+        self.last_login_at = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+
+    def _update_last_logout_time(self):
+        self.last_logout_at = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()        
+
+
+    def to_dict(self):
+        
+        data = {
+            'id' : self.id,
+            'name' : self.name,
+            'active' : self.active,
+        }
 
 
     def set_password(self, password):
@@ -68,6 +91,28 @@ class Parser(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
     data = db.relationship('Data', backref='parser', lazy='dynamic')
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
+
+
+    def get_token(self, expires_in=3600):
+        now = datetime.utcnow()
+        if self.token and self.token_expiration > now + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
+
+    def revoke_token(self):
+        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+
+    @staticmethod
+    def check_token(token):
+        client = Client.query.filter_by(token=token).first()
+        if client is None or client.token_expiration < datetime.utcnow():
+            return None
+        return client
 
 
 class Client(db.Model):
@@ -76,24 +121,43 @@ class Client(db.Model):
 
     id =  id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
-    key = db.Column(db.String)
-    secret = db.Column(db.String)
-    life_marker = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
+    
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'token': self.token,
+            'token_expiration': self.token_expiration
+        }
+    
 
-    def generate_key(self):
-        # TODO: сгенерировать ключ
-        self.key = r'$#5fdsf$%FDSF'
+    def get_token(self, expires_in=3600):
+        now = datetime.utcnow()
+        if self.token and self.token_expiration > now + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
 
-    def generate_secret(self):
-        # TODO: сгенерировать сикрет
-        self.secret = r'%^$5t6fgdgd#@$@FDSFSDF' 
+    def revoke_token(self):
+        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
 
-    def extend_life_marker(self, count):
-        # TODO: продлить клиента
-        now = time.time()
-        self.life_marker = now + count
+    @staticmethod
+    def check_token(token):
+        client = Client.query.filter_by(token=token).first()
+        if client is None or client.token_expiration < datetime.utcnow():
+            return None
+        return client
 
+
+
+####################################################################################################
+#   Классы форм
+####################################################################################################
 
 class LoginForm(FlaskForm):
     name = StringField('name', validators=[Required()])

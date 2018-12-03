@@ -21,6 +21,7 @@ def login():
             return redirect(url_for('auth.login'))
     
         login_user(user)
+        user._update_last_login_time()
  
         if current_user.has_role('admin'):
             return redirect(url_for('dashboard.get_admin_page', username=user.name))
@@ -33,6 +34,7 @@ def login():
 # Выход
 @auth.route("/logout")
 def logout():
-    
+    user = User.query.filter_by(name = current_user.name).first()
+    user._update_last_logout_time()
     logout_user()
     return redirect(url_for('auth.login'))

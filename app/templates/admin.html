@@ -1,22 +1,24 @@
 {% extends "base.html" %}
 
 {% block header %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
 {% endblock %}
 
 {% block content %}
     {% include 'menu.html' %}
 
     <div class="container">
-        <div class="row mt-3 mb-3">
+        <div class="row my-3">
     
     
             <div class="col">
                 <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">Модераторы</div>
-                        <div class="card-body">
-                            <h1 class="card-title">0</h1>
-                            <a href="#" class="btn btn-primary">Переход >></a>
+                    <div class="card border-primary text-center">
+                        <div class="card-header text-primary">Модераторы</div>
+                        <div class="card-body text-primary">
+                            <h1 id="moderators_count" class="card-title">0</h1>
+                            <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
+                            <a href="#moderators_table" class="dc-circle-btn btn btn-lg btn-primary">></a>
                         </div>
                     </div>
                 </div>
@@ -25,11 +27,12 @@
     
             <div class="col">
                 <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">Парсеры</div>
-                        <div class="card-body">
-                            <h1 class="card-title">0</h1>
-                            <a href="#" class="btn btn-primary">Переход >></a>
+                    <div class="card border-primary text-center">
+                        <div class="card-header text-primary">Парсеры</div>
+                        <div class="card-body text-primary">
+                            <h1 id="parsers_count" class="card-title">0</h1>
+                            <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
+                            <a href="#parsers_table" class="dc-circle-btn btn btn-lg btn-primary">></a>
                         </div>
                     </div>
                 </div>
@@ -38,18 +41,101 @@
     
             <div class="col">
                 <div class="col">
-                    <div class="card text-center">
-                        <div class="card-header">Клиенты</div>
-                        <div class="card-body">
-                            <h1 class="card-title">0</h1>
-                            <a href="#" class="btn btn-primary">Переход >></a>
+                    <div class="card border-primary text-center">
+                        <div class="card-header text-primary">Клиенты</div>
+                        <div class="card-body text-primary">
+                            <h1 id="clients_count" class="card-title">0</h1>
+                            <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
+                            <a href="#clients_table" class="dc-circle-btn btn btn-lg btn-primary">></a>
                         </div>
                     </div>
                 </div>
             </div>
     
         </div>
+
+
+        <!-- Таблица -->
+        <div class="row my-5">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr class="bg-primary">
+                        <td id="moderators_table" colspan="6">Администраторы и модераторы:</td>
+                    </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Идентификатор</th>
+                        <th scope="col">Активна</th>
+                        <th scope="col">Время последнего входа</th>
+                        <th scope="col">Время последнего выхода</th>
+                    </tr>
+                </thead>
+                <tbody id="dc-users-table">
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row my-5">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr class="bg-primary">
+                        <td id="parsers_table" colspan="4">Парсеры:</td>
+                    </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Фамилия</th>
+                        <th scope="col">Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">#</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row my-5">
+            <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                    <tr class="bg-primary">
+                        <td id="clients_table" colspan="4">Клиенты:</td>
+                    </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Фамилия</th>
+                        <th scope="col">Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">#</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
     </div>
 
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+
+        get_dashboard_info()
+
+        setInterval(() => {
+            get_dashboard_info()
+        }, 30000);
+    
+    </script>
 
 {% endblock %}

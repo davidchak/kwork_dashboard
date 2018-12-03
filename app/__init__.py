@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
-
 from .config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_security import SQLAlchemyUserDatastore
 from flask_security import Security
 import cli
-
 
 
 db = SQLAlchemy()
@@ -26,6 +24,9 @@ def create_app():
     db.init_app(app)
     login.init_app(app)
 
+
+
+    
     from .auth import auth as auth_bp
     app.register_blueprint(auth_bp)
 
