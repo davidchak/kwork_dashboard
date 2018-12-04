@@ -36,24 +36,30 @@ def get_admin_page(username):
 @login_required
 @roles_required('moderator')
 def get_moderator_page(username):
-    
-    return render_template('moderator.html')
+
+    clients = Client.query.filter_by(user_id = current_user.id).all()
+
+    return render_template('moderator.html', data=clients)
 
 
 
 ############################################################################################################
 #     API для личного кабинета
 ############################################################################################################
-# Добавление пользователя                 /api/v1.0/add_user                      - для авторизованного админа
-# Удаление пользователя                   /api/v1.0/del_user                      - для авторизованного админа
-# Добавление парсера                      /api/v1.0/add_parser                    - для авторизованного админа
-# Удаление парсера                        /api/v1.0/del_parser                    - для авторизованного админа
-# Добавление клиента                      /api/v1.0/add_client                    - для авторизованного админа или модератора
-# Удаление клиента                        /api/v1.0/del_client                    - для авторизованного админа или модератора
-# Получение n-последних записеё парсера   /api/v1.0/parser/get_last_query/<int>   - для авторизованного админа
-# Получение количества зарег.             /api/v1.0/dashboard/get_dashboard_info  - для авторизованного админа
-
-
+# Добавление пользователя                 /dash/v1.0/user/add_user                        - для авторизованного админа
+# Удаление пользователя                   /dash/v1.0/user/del_user                        - для авторизованного админа
+#
+# Добавление парсера                      /dash/v1.0/parser/add_parser                    - для авторизованного админа
+# Удаление парсера                        /dash/v1.0/parser/del_parser                    - для авторизованного админа
+# Получение n-последних записеё парсера   /dash/v1.0/parser/get_last_query/<int>          - для авторизованного админа
+#
+# Добавление клиента                      /dash/v1.0/client/add_client                    - для авторизованного админа или модератора
+# Удаление клиента                        /dash/v1.0/client/del_client                    - для авторизованного админа или модератора
+#
+# Получение количества зарег.             /dash/v1.0/dashboard/get_admin_info  - для авторизованного админа
+# Получение количества зарег.             /dash/v1.0/dashboard/get_moderator_info  - для авторизованного админа
+#
+#
 # Формат ответа сервера(api):
 # api_resp = {
 #     'url': '/api/v1.0/add_user',      - url запроса
@@ -74,7 +80,7 @@ api_resp = {
 
 
 # Добавление пользователя 
-@dashboard.route('/api/v1.0/add_user', methods=['POST'])
+@dashboard.route('/dash/v1.0/add_user', methods=['POST'])
 @roles_required('admin')
 def add_user():
 
@@ -82,7 +88,7 @@ def add_user():
     password = request.form['password']
     role = request.form['role']
 
-    api_resp['url'] = '/api/v1.0/add_user'
+    api_resp['url'] = '/dash/v1.0/add_user'
     api_resp['method'] = 'POST'
     
     unique_test = User.query.filter_by(name = username).first()
@@ -122,14 +128,14 @@ def add_user():
 
 
 # Удаление пользователя 
-@dashboard.route('/api/v1.0/del_user', methods=['POST'])
+@dashboard.route('/dash/v1.0/del_user', methods=['POST'])
 @roles_required('admin')
 def del_user(username):
 
-    api_resp['url'] = '/api/v1.0/del_user'
+    api_resp['url'] = '/dash/v1.0/del_user'
     api_resp['method'] = 'POST'
     
-    user = User.query.filter_by(name==username).first()
+    user = User.query.filter_by(name=username).first()
     if user and user.name != current_user.name:
         try:
             db.session.delete(user)
@@ -143,36 +149,38 @@ def del_user(username):
 
 
 # Добавление парсера 
-@dashboard.route('/api/v1.0/add_parser', methods=['POST'])
+@dashboard.route('/dash/v1.0/add_parser', methods=['POST'])
 @roles_required('admin')
 def add_parser():
     pass
 
 
 # Удаление парсера 
-@dashboard.route('/api/v1.0/del_parser', methods=['POST'])
+@dashboard.route('/dash/v1.0/del_parser', methods=['POST'])
 @roles_required('admin')
 def del_parser(pansername):
     pass
 
 
 # Добавление клиента 
-@dashboard.route('/api/v1.0/add_client', methods=['POST'])
-@roles_accepted('admin', 'moderator')
-def add_client(name):
+@dashboard.route('/dash/v1.0/client/add_client', methods=['POST'])
+@roles_accepted('moderator')
+def add_client():
 
     name = request.form['name']
 
-    api_resp['url'] = '/api/v1.0/add_user'
+    api_resp['url'] = '/dash/v1.0/client/add_user'
     api_resp['method'] = 'GET'
     
     new_client = Client(name=name)
+    new_client.user = current_user
     new_client.get_token()
     
     try:
         db.session.add(new_client)
         db.session.commit()
         api_resp['success'] = True
+        api_resp['data'] = {'token': new_client.token}
     except:
         api_resp['error'] = 'Add client error'
         return jsonify(api_resp)
@@ -183,18 +191,18 @@ def add_client(name):
 
 
 # Удаление клиента 
-@dashboard.route('/api/v1.0/del_client', methods=['POST'])
+@dashboard.route('/dash/v1.0/del_client', methods=['POST'])
 @roles_accepted('admin', 'moderator')
 def del_client(name):
     pass
 
 
 # Получение n-последних записей парсера
-@dashboard.route('/api/v1.0/parser/get_last_query/<int:count>', methods=['GET'])
+@dashboard.route('/dash/v1.0/parser/get_last_query/<int:count>', methods=['GET'])
 @roles_required('admin')
 def get_last_query(count):
     
-    api_resp['url'] = '/api/v1.0/add_user'
+    api_resp['url'] = '/dash/v1.0/add_user'
     api_resp['method'] = 'GET'
 
     data_list = []
@@ -215,13 +223,41 @@ def get_last_query(count):
     return jsonify(api_resp)
 
 
+
+# Информация для панели управления
+# общая для модератора!
+@dashboard.route('/dash/v1.0/dashboard/get_moderator_info', methods=['GET'])
+@roles_required('moderator')
+def get_moderator_info():
+
+    api_resp['url'] = '/dash/v1.0/dashboard/get_moderator_info'
+    api_resp['method'] = 'GET'
+
+    try:
+        clients_count = current_user.get_client_count()
+       
+        resp_data = {
+            'clients_count': clients_count
+            }
+        
+        api_resp['data'] = resp_data
+        api_resp['success'] = True
+        
+    except Exception as err:
+        api_resp['success'] = False
+        api_resp['error'] = 'Response data error'
+
+    return jsonify(api_resp)
+
+
+
 # Информация для панели управления
 # общая для админа!
-@dashboard.route('/api/v1.0/dashboard/get_dashboard_info', methods=['GET'])
+@dashboard.route('/dash/v1.0/dashboard/get_admin_info', methods=['GET'])
 @roles_required('admin')
-def get_parsers_count():
+def get_admin_info():
     
-    api_resp['url'] = '/api/v1.0/dashboard/get_count'
+    api_resp['url'] = '/dash/v1.0/dashboard/get_admin_info'
     api_resp['method'] = 'GET'
     
     try:

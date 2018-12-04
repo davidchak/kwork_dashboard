@@ -57,10 +57,11 @@
 
         <!-- Таблица -->
         <div class="row my-5">
+
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="moderators_table" colspan="6">Администраторы и модераторы:</td>
+                        <td id="moderators_table" class="text-white" colspan="6">Администраторы и модераторы:</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
@@ -81,7 +82,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="parsers_table" colspan="4">Парсеры:</td>
+                        <td id="parsers_table" class="text-white" colspan="4">Парсеры:</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
@@ -105,7 +106,7 @@
             <table class="table table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="clients_table" colspan="4">Клиенты:</td>
+                        <td id="clients_table" class="text-white" colspan="4">Клиенты:</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
@@ -130,10 +131,10 @@
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
 
-        get_dashboard_info()
+        get_admin_info()
 
         setInterval(() => {
-            get_dashboard_info()
+            get_admin_info()
         }, 30000);
     
     </script>

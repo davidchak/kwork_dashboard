@@ -13,6 +13,7 @@ class Config(object):
     SECURITY_TRACKABLE =True        # Flask-security
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+    SECURITY_TRACKABLE = True
 
 
 # class Dev(Config):

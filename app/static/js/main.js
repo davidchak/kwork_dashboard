@@ -56,9 +56,9 @@
 // }
 
 // TODO: написать функцию обновления сразу для всех
-function get_dashboard_info(){
+function get_admin_info(){
     $.get({
-        url: '/api/v1.0/dashboard/get_dashboard_info',
+        url: '/dash/v1.0/dashboard/get_admin_info',
         dataType: 'json'
     }).done(
         function (data) {
@@ -66,10 +66,9 @@ function get_dashboard_info(){
             el_moderators = $('#moderators_count')
             el_parsers = $('#parsers_count')
             el_clients = $('#clients_count')
-            table_users = $('#dc-users-table')
-            table_users.empty()
+           
 
-            console.log(data)
+            console.log(data['data'])
 
             if (data['success'] === true) {
                 
@@ -88,11 +87,15 @@ function get_dashboard_info(){
                     el_clients[0].innerText = data['data'].clients_count
                 }
 
-                u_data = data['data']['users']
+                if (data['data']['users']){
+                    table_users = $('#dc-users-table')
+                    table_users.empty()
 
-                for (let row in u_data ){
-                    table_users.append("<tr id='user_row_" + u_data[row].id + "><td>" + u_data[row].id + "</td> <td>" + u_data[row].name + "</td> <td>" + u_data[row].active + "</td> <td>" + u_data[row].last_login + "</td> <td>" + u_data[row].last_logout + "</td> </tr>");
-                } 
+                    for (var row in data['data']['users']) {
+                        table_users.append("<tr id='row_id_" + data['data']['users'][row].id + "'><td>" + row + "</td> <td>" + data['data']['users'][row].name + "</td> <td>" + data['data']['users'][row].id + "</td> <td>" + data['data']['users'][row].active + "</td> <td>" + data['data']['users'][row].last_login + "</td> <td>" + data['data']['users'][row].last_logout +"</td></tr>")
+                    } 
+                }  
+                
 
             } else {
                 console.log(data['error'])
@@ -104,25 +107,77 @@ function get_dashboard_info(){
 }
 
 
-function add_user(name, password, role) {
-    $.ajax({
-        data: {
-            name: name,
-            password: password,
-            role: role
+// function add_user(name, password, role) {
+//     $.ajax({
+//         data: {
+//             name: name,
+//             password: password,
+//             role: role
 
+//         },
+//         type: 'POST',
+//         url: '/api/v1.0/add_user'
+//     }).done(
+//         function (data) {
+//             if (data['success'] === true) {
+//                 get_dashboard_info()
+//                 console.log(data)
+//             } else {
+//                 console.log(data['error'])
+//             }
+
+//         }
+//     )
+// }
+
+
+
+// Добавляем клиента
+function add_client(name) {
+    $.post({
+        data: {
+            name: name
         },
         type: 'POST',
-        url: '/api/v1.0/add_user'
+        url: '/dash/v1.0/client/add_client'
     }).done(
         function (data) {
             if (data['success'] === true) {
-                get_dashboard_info()
                 console.log(data)
             } else {
                 console.log(data['error'])
             }
-
         }
+    )
+}
+
+
+// ОБНОВЛЕНИЕ ДАННЫХ ДЛЯ СТАРНИЦЫ МОДЕРАТОРА
+function get_moderator_info(){
+
+    $.get({
+        url: '/dash/v1.0/dashboard/get_moderator_info',
+        dataType: 'json'
+    }).done(
+        function (data) {
+            
+            el_clients = $('#clients_count')
+           
+
+            console.log(data['data'])
+
+            if (data['success'] === true) {
+                
+                if (el_clients[0].innerText != data['data'].clients_count) {
+
+                    el_clients[0].innerText = data['data'].clients_count
+                }
+
+            } else {
+                console.log(data['error'])
+            }
+            
+        }
+        
     )
 }

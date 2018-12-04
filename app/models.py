@@ -7,8 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_security import RoleMixin, UserMixin
 from app import db, login
 import time
-import base64
 from datetime import datetime, timedelta
+import base64
 import os
 
 
@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(20), unique=True, index=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), default=None)
-    active = db.Column(db.Boolean)
+    active = db.Column(db.Boolean, default=True)
     roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
     clinets = db.relationship('Client', backref='user', lazy='dynamic')
     last_login_at = db.Column(db.DateTime())
@@ -40,14 +40,27 @@ class User(UserMixin, db.Model):
     # last_login_ip = db.Column(db.String(100))
     # current_login_ip = db.Column(db.String(100))
 
+    def get_client_count(self):
+        count = Client.query.filter_by(user=self).count()
+        return count
 
-    def _update_last_login_time(self):
-        self.last_login_at = datetime.utcnow()
+
+    def add_client(self, name):
+        new_client = Client(name=name)
+        new_client.user = self
+        new_client.get_token()
+        db.session.add(new_client)
+        db.session.commit()
+        return new_client.token
+
+
+    def _update_last_login_time(self, date):
+        self.last_login_at = date
         db.session.add(self)
         db.session.commit()
 
-    def _update_last_logout_time(self):
-        self.last_logout_at = datetime.utcnow()
+    def _update_last_logout_time(self, date):
+        self.last_logout_at = date
         db.session.add(self)
         db.session.commit()        
 
@@ -121,18 +134,10 @@ class Client(db.Model):
 
     id =  id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
+    active = db.Column(db.Boolean)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
-    
-    def to_dict(self):
-        data = {
-            'id': self.id,
-            'name': self.name,
-            'token': self.token,
-            'token_expiration': self.token_expiration
-        }
-    
 
     def get_token(self, expires_in=3600):
         now = datetime.utcnow()
@@ -171,9 +176,10 @@ class AddUserForm(FlaskForm):
     submit = SubmitField('Add')
 
 
-class NewParserForm(FlaskForm):
+class AddParserForm(FlaskForm):
     name = StringField('name', validators=[Required()])
     submit = SubmitField('Add')
+
 
 
 
