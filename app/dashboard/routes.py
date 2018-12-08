@@ -27,8 +27,19 @@ def get_index_page():
 @login_required
 @roles_required('admin')
 def get_admin_page(username):
+    
+    users = User.query.all()
+    parsers = Parser.query.all()
+    clients = Client.query.all()
+    clients_count = Client.query.count()
+    parsers_count = Parser.query.count()
+    
+    admins_role = Role.query.filter_by(name='admin').first()
+    admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
+    moderators_role = Role.query.filter_by(name='moderator').first()
+    moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
 
-    return render_template('admin.html')
+    return render_template('admin.html', clients=clients, users=users, parsers=parsers, clients_count=clients_count, parsers_count=parsers_count, moderators_count=moderators_count, admins_count=admins_count)
 
 
 # Модераторка
@@ -39,7 +50,7 @@ def get_moderator_page(username):
 
     clients = Client.query.filter_by(user_id = current_user.id).all()
 
-    return render_template('moderator.html', data=clients)
+    return render_template('moderator.html', clients=clients)
 
 
 

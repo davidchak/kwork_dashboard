@@ -7,18 +7,40 @@
 {% block content %}
     {% include 'menu.html' %}
 
-    <div class="container">
+    <div class="container-fluid">
         <div class="row my-3">
-    
+            
+            <div class="col">
+                <div class="col">
+                    <div class="card border-primary text-center">
+                        <div class="card-header text-primary">Администраторы</div>
+                        <div class="card-body text-primary">
+                            {% if admins_count %}
+                            <h1 id="moderators_count" class="card-title">
+                                {{ admins_count }}
+                            </h1>
+                            {% else %}
+                            <h1 id="moderators_count" class="card-title">0</h1>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
     
             <div class="col">
                 <div class="col">
                     <div class="card border-primary text-center">
                         <div class="card-header text-primary">Модераторы</div>
                         <div class="card-body text-primary">
+                        {% if moderators_count %}
+                            <h1 id="moderators_count" class="card-title">
+                                {{ moderators_count }}
+                            </h1>
+                        {% else %}
                             <h1 id="moderators_count" class="card-title">0</h1>
-                            <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
-                            <a href="#moderators_table" class="dc-circle-btn btn btn-lg btn-primary">></a>
+                        {% endif %}
+   
                         </div>
                     </div>
                 </div>
@@ -30,9 +52,14 @@
                     <div class="card border-primary text-center">
                         <div class="card-header text-primary">Парсеры</div>
                         <div class="card-body text-primary">
+                        {% if parsers_count %}
+                            <h1 id="parsers_count" class="card-title">
+                                {{ parsers_count }}
+                            </h1>
+                        {% else %}
                             <h1 id="parsers_count" class="card-title">0</h1>
-                            <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
-                            <a href="#parsers_table" class="dc-circle-btn btn btn-lg btn-primary">></a>
+                        {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -44,9 +71,15 @@
                     <div class="card border-primary text-center">
                         <div class="card-header text-primary">Клиенты</div>
                         <div class="card-body text-primary">
-                            <h1 id="clients_count" class="card-title">0</h1>
-                            <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
-                            <a href="#clients_table" class="dc-circle-btn btn btn-lg btn-primary">></a>
+                            {% if clients_count %}
+                            <h1 id="clients_count" class="card-title">
+                                {{ clients_count }}
+                            </h1>
+                            {% else %}
+                            <h1 id="clients_count" class="card-title">
+                                0
+                            </h1>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -55,87 +88,162 @@
         </div>
 
 
-        <!-- Таблица -->
-        <div class="row my-5">
+        <!-- Таблица пользователи -->
+        <div class="row my-5 mx-3">
 
-            <table class="table table-hover table-sm">
+            <table class="table table-bordered table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="moderators_table" class="text-white" colspan="6">Администраторы и модераторы:</td>
+                        <td id="moderators_table" class="text-white" colspan="7">Пользователи</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Имя</th>
-                        <th scope="col">Идентификатор</th>
-                        <th scope="col">Активна</th>
-                        <th scope="col">Время последнего входа</th>
-                        <th scope="col">Время последнего выхода</th>
+                        <th scope="col">Роль</th>
+                        <th scope="col">Активен</th>
+                        <th scope="col" class="text-center">Время последнего входа</th>
+                        <th scope="col" class="text-center">Время последнего выхода</th>
+                        <th scope="col" class="text-center">Действия</th>
                     </tr>
                 </thead>
                 <tbody id="dc-users-table">
+                {% if users %}
+                    {% for user in users %}
+                    <tr id="{{ user.id }}">
+                        <th scope="row">{{ user.id }}</th>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.roles[0].name }}</td>
+                        <td>{{ user.active }}</td>
+                        <td class="text-center">{{ user.last_login_at }}</td>
+                        <td class="text-center">{{ user.last_logout_at }}</td>
+                        <td class="text-center">
+                            <a href="#" class="btn btn-sm btn-outline-primary mr-2">Актив./Деактив.</a>
+                            <a href="#" class="btn btn-sm btn-outline-danger mr-2">удалить</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Пользователи не обнаружены!</td>
+                </tr>
+                {% endif %}
                     
                 </tbody>
+                <!-- Создание пользователя -->
+                <tr class="table-active">
+                    <td class="text-white" colspan="7">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="">Логин и пароль</span>
+                            </div>
+                            <input type="text" class="form-control">
+                            <input type="password" class="form-control">
+                            
+                            <select class="custom-select" id="inputGroupSelect01">
+                                <option selected>Роль</option>
+                                <option value="1">Модератор</option>
+                                <option value="2">Администратор</option>
+                            </select>
+
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Создать</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
             </table>
         </div>
 
-        <div class="row my-5">
-            <table class="table table-hover table-sm">
+        <!-- Таблица парсеры -->
+        <div class="row my-5 mx-3">
+            <table class="table table-bordered table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="parsers_table" class="text-white" colspan="4">Парсеры:</td>
+                        <td id="parsers_table" class="text-white" colspan="5">Парсеры</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Имя</th>
-                        <th scope="col">Фамилия</th>
-                        <th scope="col">Username</th>
+                        <th scope="col">Дата</th>
+                        <th scope="col" class="text-center">Токен</th>
+                        <th scope="col" class="text-center">Действителен до</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">#</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
+                {% if parsers %}
+                    {% for parser in parsers %}
+                    <tr id="{{ parser.id }}">
+                        <th scope="row">{{ parser.id }}</th>
+                        <td>{{ parser.name }}</td>
+                        <td>{{ parser.date }}</td>
+                        <td class="text-center">{{ parser.token }}</td>
+                        <td class="text-center">{{ parser.token_expiration }}</td>
                     </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="5" class="text-center">Нет доступных парсеров!</td></tr>
+                {% endif %}
                 </tbody>
+                <tr class="table-active">
+                    <td class="text-white" colspan="7">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="">Имя</span>
+                            </div>
+                            <input type="text" class="form-control">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Создать</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
             </table>
         </div>
 
-        <div class="row my-5">
-            <table class="table table-hover table-sm">
+        <!-- Таблица клиенты -->
+        <div class="row my-5 mx-3">
+            <table class="table table-bordered table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="clients_table" class="text-white" colspan="4">Клиенты:</td>
+                        <td id="clients_table" class="text-white" colspan="6">Клиенты</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Имя</th>
-                        <th scope="col">Фамилия</th>
-                        <th scope="col">Username</th>
+                        <th scope="col">Создатель</th>
+                        <th scope="col" class="text-center">Активен</th>
+                        <th scope="col" class="text-center">Токен</th>
+                        <th scope="col" class="text-center">Действует до</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">#</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
+                {% if clients %}
+                    {% for client in clients %}
+                    <tr id="{{ client.id }}">
+                        <th scope="row">{{ client.id }}</th>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.user.name }}</td>
+                        <td class="text-center">{{ client.active }}</td>
+                        <td class="text-center">{{ client.token }}</td>
+                        <td class="text-center">{{ client.token_expiration }}</td>
                     </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Клиенты не найдены!</td>
+                    </tr>
+                {% endif %}
                 </tbody>
             </table>
         </div>
-        
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
 
-        get_admin_info()
-
-        setInterval(() => {
-            get_admin_info()
-        }, 30000);
+        // setInterval(() => {
+        //     get_admin_info()
+        // }, 30000);
     
     </script>
 

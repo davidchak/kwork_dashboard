@@ -134,7 +134,7 @@ class Client(db.Model):
 
     id =  id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
-    active = db.Column(db.Boolean)
+    active = db.Column(db.Boolean, default=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)

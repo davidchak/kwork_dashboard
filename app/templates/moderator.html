@@ -7,16 +7,20 @@
 {% block content %}
     {% include 'menu.html' %}
 
-    <div class="container">
+    <div class="container-fluid">
         
-        <div class="row my-3">  
+        <div class="row my-3 mx-1">  
 
             <div class="card-deck m-auto w-100">
             
                 <div class="card border-primary text-center w-40">
                     <div class="card-header text-primary">Клиенты</div>
                     <div class="card-body">
+                    {% if clients %}
+                        <h1 id="clients_count" class="card-title"> {{ clients|count }}</h1>
+                    {% else %}
                         <h1 id="clients_count" class="card-title">0</h1>
+                    {% endif %}
                     </div>
                 </div>
             
@@ -40,8 +44,8 @@
 
         </div>
 
-        <div class="row my-5">
-            <table class="table table-hover table-sm">
+        <div class="row my-5 mx-3">
+            <table class="table table-bordered table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
                         <td id="moderators_table" class="text-white" colspan="6">Клиенты:</td>
@@ -57,15 +61,15 @@
                 </thead>
                 <tbody id="dc-clients-table">
                     
-                {% if data %}    
-                    {% for row in data %}
+                {% if clients %}    
+                    {% for row in clients %}
                     <tr id="{{ row.id }}">
                         <td class="text-center">{{ row.id }}</td>
                         <td class="text-center">{{ row.name }}</td>
                         <td class="text-center">{{ row.active }}</td>
                         <td class="text-center">{{ row.token }}</td>
                         <td class="text-center">{{ row.token_expiration }}</td>
-                        <td class="text-right">
+                        <td class="text-center">
                             <a href="#" class="btn btn-sm btn-outline-primary mr-2">продлить</a>
                             <a href="#" class="btn btn-sm btn-outline-warning mr-2">деактивировать</a>
                             <a href="#" class="btn btn-sm btn-outline-danger mr-2">удалить</a>
@@ -89,11 +93,11 @@
 
     <script>
         
-        get_moderator_info()
+        // get_moderator_info()
 
-        setInterval(() => {
-            get_moderator_info()
-        }, 30000);
+        // setInterval(() => {
+        //     get_moderator_info()
+        // }, 30000);
 
     </script>
 

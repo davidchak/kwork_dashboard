@@ -3,7 +3,7 @@
 from flask import redirect, render_template, url_for, current_app
 from flask_login import login_user, logout_user
 from flask_security import current_user
-from app.models import User, LoginForm
+from app.models import User, Parser, Client, LoginForm
 from . import auth
 from datetime import datetime
 
@@ -26,6 +26,7 @@ def login():
  
         if current_user.has_role('admin'):
             return redirect(url_for('dashboard.get_admin_page', username=user.name))
+
         elif current_user.has_role('moderator'):
             return redirect(url_for('dashboard.get_moderator_page', username=user.name))
     
