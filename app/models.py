@@ -32,18 +32,19 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), default=None)
     active = db.Column(db.Boolean, default=True)
-    roles = db.relationship('Role', secondary=roles_users, backref=db.backref('users', lazy='dynamic'))
     clinets = db.relationship('Client', backref='user', lazy='dynamic')
     last_login_at = db.Column(db.DateTime())
     last_logout_at = db.Column(db.DateTime())
-    # current_login_at = db.Column(db.DateTime())
-    # last_login_ip = db.Column(db.String(100))
-    # current_login_ip = db.Column(db.String(100))
 
     def get_client_count(self):
         count = Client.query.filter_by(user=self).count()
         return count
-
+    
+    def activ_deactiv_user(self):
+        if self.active == True:
+            self.active = False
+        elif self.active == False:
+            self.active = True 
 
     def add_client(self, name):
         new_client = Client(name=name)
@@ -52,7 +53,6 @@ class User(UserMixin, db.Model):
         db.session.add(new_client)
         db.session.commit()
         return new_client.token
-
 
     def _update_last_login_time(self, date):
         self.last_login_at = date
@@ -66,12 +66,15 @@ class User(UserMixin, db.Model):
 
 
     def to_dict(self):
-        
         data = {
             'id' : self.id,
             'name' : self.name,
             'active' : self.active,
+            'role' : self.roles[0].name,
+            'last_login_at': self.last_login_at,
+            'last_logout_at': self.last_logout_at,
         }
+        return data
 
 
     def set_password(self, password):
@@ -82,9 +85,11 @@ class User(UserMixin, db.Model):
 
 
 class Role(db.Model, RoleMixin):
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     description = db.Column(db.String(255))
+    users = db.relationship('User', secondary=roles_users, backref=db.backref('roles', lazy='dynamic'))
 
 
 class Data(db.Model):
@@ -105,28 +110,40 @@ class Parser(db.Model):
     name = db.Column(db.String)
     data = db.relationship('Data', backref='parser', lazy='dynamic')
     token = db.Column(db.String(32), index=True, unique=True)
-    token_expiration = db.Column(db.DateTime)
 
-
-    def get_token(self, expires_in=3600):
+    def get_token(self, expires_in=432000):
         now = datetime.utcnow()
-        if self.token and self.token_expiration > now + timedelta(seconds=60):
+        if self.token:
             return self.token
         self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
-        self.token_expiration = now + timedelta(seconds=expires_in)
         db.session.add(self)
         return self.token
 
-    def revoke_token(self):
-        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
 
-    @staticmethod
-    def check_token(token):
-        client = Client.query.filter_by(token=token).first()
-        if client is None or client.token_expiration < datetime.utcnow():
-            return None
-        return client
-
+    def to_dict(self):
+        parser_data = []
+        for i in self.data:
+            parser_data.append({
+                'id': i.id,
+                'datestamp': i.datestamp,
+                'json': i.json
+            })
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'token': self.token,
+            'data': parser_data
+        } 
+        return data
+    
+    def set_data(self, datestamp, json):
+        data = Data()
+        data.datestamp = datestamp
+        data.parser = self
+        data.json = json
+        db.session.add(data)
+        db.session.commit()
+        
 
 class Client(db.Model):
 
@@ -138,25 +155,52 @@ class Client(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
+    last_login_at = db.Column(db.DateTime())
 
-    def get_token(self, expires_in=3600):
+
+    def get_token(self, expires_in=10):
         now = datetime.utcnow()
         if self.token and self.token_expiration > now + timedelta(seconds=60):
             return self.token
         self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
-        self.token_expiration = now + timedelta(seconds=expires_in)
+        self.token_expiration = now + timedelta(days=expires_in)
         db.session.add(self)
         return self.token
+    
+    def update_token_expiration(self, num):
+        now = datetime.utcnow()
+        self.token_expiration = now + timedelta(days=num)
+
+    def update_last_login_time(self, date):
+        self.last_login_at = date
+        db.session.add(self)
+        db.session.commit()
+
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'active': self.active,
+            'token': self.token,
+            'token_expiration': self.token_expiration
+        }
+        return data
 
     def revoke_token(self):
         self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
 
-    @staticmethod
-    def check_token(token):
-        client = Client.query.filter_by(token=token).first()
-        if client is None or client.token_expiration < datetime.utcnow():
-            return None
-        return client
+    # @staticmethod
+    # def check_token(token):
+    #     client = Client.query.filter_by(token=token).first()
+    #     if client is None or client.token_expiration < datetime.utcnow():
+    #         return None
+    #     return client
+    
+    def activ_deactiv_client(self):
+        if self.active == True:
+            self.active = False
+        elif self.active == False:
+            self.active = True
 
 
 

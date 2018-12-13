@@ -1,20 +1,32 @@
 # -*- coding: utf-8 -*-
 
-from flask import g
+from flask import g, Response, abort, jsonify, make_response
 from app.models import Client, Parser
 from flask_httpauth import HTTPTokenAuth
 from .errors import error_response
+from datetime import datetime
 
 
 client_token_auth = HTTPTokenAuth()
 
 parser_token_auth = HTTPTokenAuth()
 
-
+# Авторизация для клиентов по токену
+# Пропускает если учетка активна 
 @client_token_auth.verify_token
 def verify_token(token):
-    g.current_user = Client.check_token(token) if token else None
-    return g.current_user is not None
+    client = Client.query.filter_by(token=token).first()
+    if client and client.active:
+        # if client.token_expiration < datetime.utcnow():
+        if client.token_expiration < datetime.now():
+            resp = make_response(jsonify({'error':'The key has expired!'}))
+            resp.headers ['Content-Type'] = 'application/json'
+            return abort(resp)
+        else:
+            client.update_last_login_time(datetime.now())
+            return client 
+    else: 
+        return False
 
 
 @client_token_auth.error_handler
@@ -24,5 +36,9 @@ def token_auth_error():
 
 @parser_token_auth.verify_token
 def verify_token(token):
-    g.current_user = Parser.check_token(token) if token else None
-    return g.current_user is not None
+    # g.current_user = Parser.check_token(token) if token else None
+    # return g.current_user is not None
+    parser = Parser.query.filter_by(token=token).first()
+    if not parser:
+        return None
+    return parser

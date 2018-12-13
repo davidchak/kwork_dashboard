@@ -17,13 +17,69 @@ from .auth import client_token_auth, parser_token_auth
 # TODO: Отправка данных в базу для зарег.парсера    /api/v1.0/parser/set_data   POST
 
 
+
+
 @api.route('/api/v1.0/client/get_data/<int:count>', methods=['GET'])
 @client_token_auth.login_required
 def get_client_data(count):
-    return jsonify({'success': True})
+    
+
+    api_resp = {
+        'url': '',     
+        'method': '',                 
+        'success': True,                 
+        'resp_data': '',               
+        'error': ''                
+    }
+
+    api_resp['url'] = '/api/v1.0/client/get_data/<count>'
+    api_resp['method'] = 'GET'
+
+    data_list = []
+    data = db.session.query(Data).order_by(Data.id.desc()).limit(count)
+
+    for item in data:
+        new_item = {
+            'id': item.id,
+            'parser_id': item.parser_id,
+            'datestamp': item.datestamp,
+            'json': item.json
+        }
+        data_list.append(new_item)
+
+    api_resp['success'] = True
+    api_resp['resp_data'] = data_list
+
+    return jsonify(api_resp)
 
 
 @api.route('/api/v1.0/parser/set_data', methods=['POST'])
 @parser_token_auth.login_required
 def set_parser_data():
-    pass
+    
+    api_resp = {
+        'url': '',     
+        'method': '',                 
+        'success': True,                 
+        'resp_data': '',               
+        'error': ''                
+    }
+
+    data = request.json
+
+
+    api_resp['url'] = '/api/v1.0/parser/set_data'
+    api_resp['method'] = 'POST'
+
+    parser = Parser.query.filter_by(token=data['token']).first()
+
+    if parser:
+        parser.set_data(datestamp=data['datestamp'], json=str(data['json']))
+        api_resp['success'] = True
+    else:
+        api_resp['success'] = False
+
+    return jsonify(api_resp)
+    # return jsonify({
+    #     'token': data['token']
+    #     })

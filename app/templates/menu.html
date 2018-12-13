@@ -5,11 +5,7 @@
     </button>
     {% if current_user.has_role('admin') %}
         <a class="navbar-brand" href="{{ url_for('dashboard.get_admin_page', username=current_user.name) }}">{{ current_user.name }}</a>
-        
-        
-        <a class="nav-item mx-2" href="#moderators_table">Пользователи</a>
-        <a class="nav-item mx-2" href="#moderators_table">Парсеры</a>
-        <a class="nav-item mx-2" href="#moderators_table">Клиенты</a>
+    
     {% else %}
         <a class="navbar-brand" href="{{ url_for('dashboard.get_moderator_page',  username=current_user.name) }}">{{ current_user.name }}</a>
     {% endif %}

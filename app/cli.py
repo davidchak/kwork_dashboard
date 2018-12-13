@@ -45,19 +45,40 @@ def register(app):
         print('Init DB: Success!')
 
 
+    @system.command()
+    def add_test_users():
+        """Add test users."""
+        
+        from app import db
+        from models import Role
+
+        u1 = app.user_datastore.create_user(name='test_admin')
+        u1.password_hash = generate_password_hash('test_admin')
+        r1 = Role.query.filter_by(name='admin').first()
+        u2 = app.user_datastore.create_user(name='test_moderator')
+        u2.password_hash = generate_password_hash('test_moderator')
+        r2 = Role.query.filter_by(name='moderator').first()
+        u3 = app.user_datastore.create_user(name='test_demo')
+        u3.password_hash = generate_password_hash('test_demo')
 
 
-    # @setup_app.cli.command()
-    # @click.argument('name')
-    # @click.argument('passwd')
-    # def adduser(name, passwd):
-    #     """Add new user account"""
-    #     u = user_datastore.create_user(name=name)
-    #     u.password_hash = generate_password_hash(passwd)
-    #     try:
-    #         db.session.add(u)
-    #         db.session.commit()
-    #         print('User {} is created!'.format(name))
-    #     except Exception as err:
-    #         db.session.rollback()
-    #         print('Error: ', err)
+        try:
+            db.session.commit()
+        except Exception as err:
+            db.session.rollback()
+            print('Error: ', err)
+        
+        app.user_datastore.add_role_to_user(u1, r1)
+        app.user_datastore.add_role_to_user(u2, r2)
+        app.user_datastore.add_role_to_user(u3, r2)
+        
+        try:
+            db.session.commit()
+        except Exception as err:
+            db.session.rollback()
+            print('Error: ', err)
+
+        print('ADD TEST USER: Done')
+            
+        
+

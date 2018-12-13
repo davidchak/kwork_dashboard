@@ -29,10 +29,10 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-sm-6 col-md-8 col-lg-10">
-                                <input type="text" class="form-control mt-2" , placeholder="Клиент">
+                                <input id="input_new_client_name" type="text" class="form-control mt-2" , placeholder="Клиент"></input>
                             </div>
                             <div class="col-sm-6 col-md-4 col-lg-2">
-                                <a href="#" class="dc-circle-btn btn btn-lg btn-primary mr-2">+</a>
+                                <button class="dc-circle-btn btn btn-lg btn-primary mr-2" onclick="add_client()">+</button>
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
             <table class="table table-bordered table-hover table-sm">
                 <thead class="thead-light">
                     <tr class="bg-primary">
-                        <td id="moderators_table" class="text-white" colspan="6">Клиенты:</td>
+                        <td id="moderators_table" class="text-white" colspan="8">Клиенты:</td>
                     </tr>
                     <tr>
                         <th scope="col">#</th>
@@ -56,49 +56,45 @@
                         <th scope="col " class="text-center">Активен</th>
                         <th scope="col " class="text-center">Токен</th>
                         <th scope="col " class="text-center">Действует до</th>
-                        <th scope="col " class="text-center">Действия</th>
+                        <th scope="col " class="text-center">Последний вход</th>
+                        <th scope="col " colspan="2" class="text-center">Действия</th>
                     </tr>
                 </thead>
                 <tbody id="dc-clients-table">
                     
                 {% if clients %}    
-                    {% for row in clients %}
-                    <tr id="{{ row.id }}">
-                        <td class="text-center">{{ row.id }}</td>
-                        <td class="text-center">{{ row.name }}</td>
-                        <td class="text-center">{{ row.active }}</td>
-                        <td class="text-center">{{ row.token }}</td>
-                        <td class="text-center">{{ row.token_expiration }}</td>
+                    {% for client in clients %}
+                    <tr id="client_row_{{ client.id }}">
+                        <td class="text-center">{{ client.id }}</td>
+                        <td class="text-center">{{ client.name }}</td>
+                        <td class="text-center dc_client_status">{{ client.active }}</td>
+                        <td class="text-center">{{ client.token }}</td>
+                        <td id="dc_client_token_expiration_{{ client.id }}" class="text-center">{{ client.token_expiration }}</td>
+                        <td class="text-center">{{ client.last_login_at }}</td>
                         <td class="text-center">
-                            <a href="#" class="btn btn-sm btn-outline-primary mr-2">продлить</a>
-                            <a href="#" class="btn btn-sm btn-outline-warning mr-2">деактивировать</a>
-                            <a href="#" class="btn btn-sm btn-outline-danger mr-2">удалить</a>
+                            <div class="input-group">
+                                <input id="input_count_{{ client.id }}" type="number" class="form-control form-control-sm" style="max-width: 60px;"
+                                    aria-describedby="button-addon2">
+                                <div class="input-group-append">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" id="button-addon2" onclick="update_token_expiration({{ client.id }})">Продлить</button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-warning mr-2" onclick="activ_deactiv_client({{ client.id }})">Деактивировать</button>
+                            <button class="btn btn-sm btn-outline-danger mr-2" onclick="del_client({{ client.id }})">Удалить</button>
                         </td>
                     </tr>
                     {% endfor %}
-                {% endif %}
-                    
+                {% endif %}      
                 </tbody>
             </table>
         </div>
-
     </div>
     
     
 {% endblock %}
 
 {% block script %}
-
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-    <script>
-        
-        // get_moderator_info()
-
-        // setInterval(() => {
-        //     get_moderator_info()
-        // }, 30000);
-
-    </script>
-
+<script src="{{ url_for('static', filename='js/moderator.js') }}"></script>
 {% endblock %}
