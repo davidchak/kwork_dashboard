@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
+{% endblock %}
+
+{% block content %}
+    {% include 'menu.html' %}
+
+    <div class="container-fluid">
+        
+        <!-- Таблица пользователи -->
+        <div class="row my-5 mx-3">
+
+            <table class="table table-bordered table-hover table-sm">
+                <thead class="thead-light">
+                    <tr class="bg-primary">
+                        <td id="parser_data_table" class="text-white" colspan="7">{{ parser_dict['name'] }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Время</th>
+                        <th scope="col">Данные</th>
+                    </tr>
+                </thead>
+                <tbody id="dc-users-table">
+                {% if parser_dict['data'] %}
+                    {% for row in parser_dict['data'] %}
+                    <tr>
+                        <th scope="row">{{ row['id'] }}</th>
+                        <td>{{ row['datestamp'] }}</td>
+                        <td>{{ row['json'] }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
