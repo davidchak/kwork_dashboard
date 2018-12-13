@@ -24,9 +24,6 @@ def create_app():
     db.init_app(app)
     login.init_app(app)
 
-
-
-    
     from .auth import auth as auth_bp
     app.register_blueprint(auth_bp)
 
@@ -36,7 +33,6 @@ def create_app():
     from .api import api as api_bp
     app.register_blueprint(api_bp)
 
-    # Flask-security
     from .models import User, Role
     app.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, app.user_datastore)

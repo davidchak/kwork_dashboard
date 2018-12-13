@@ -97,7 +97,7 @@ class Data(db.Model):
     __tablename__ = 'data'
 
     id = db.Column(db.Integer, primary_key = True, autoincrement=True)
-    datestamp = db.Column(db.String)
+    datestamp = db.Column(db.DateTime)
     json = db.Column(db.String)
     parser_id = db.Column(db.Integer, db.ForeignKey('parsers.id'))
     
@@ -189,24 +189,12 @@ class Client(db.Model):
     def revoke_token(self):
         self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
 
-    # @staticmethod
-    # def check_token(token):
-    #     client = Client.query.filter_by(token=token).first()
-    #     if client is None or client.token_expiration < datetime.utcnow():
-    #         return None
-    #     return client
-    
     def activ_deactiv_client(self):
         if self.active == True:
             self.active = False
         elif self.active == False:
             self.active = True
 
-
-
-####################################################################################################
-#   Классы форм
-####################################################################################################
 
 class LoginForm(FlaskForm):
     name = StringField('name', validators=[Required()])

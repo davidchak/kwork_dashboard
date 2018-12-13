@@ -7,16 +7,7 @@ from . import api
 from app import db
 from app.models import Data, User, Parser, Client, Role
 from .auth import client_token_auth, parser_token_auth
-
-
-
-############################################################################################################
-#     API для парсеров и клиентов
-############################################################################################################
-# TODO: Получение информации для клиентов           /api/v1.0/client/get_data   GET
-# TODO: Отправка данных в базу для зарег.парсера    /api/v1.0/parser/set_data   POST
-
-
+from datetime import datetime
 
 
 @api.route('/api/v1.0/client/get_data/<int:count>', methods=['GET'])
@@ -56,6 +47,8 @@ def get_client_data(count):
 @api.route('/api/v1.0/parser/set_data', methods=['POST'])
 @parser_token_auth.login_required
 def set_parser_data():
+
+    format = r"%Y-%m-%d %H:%M:%S"
     
     api_resp = {
         'url': '',     
@@ -74,12 +67,9 @@ def set_parser_data():
     parser = Parser.query.filter_by(token=data['token']).first()
 
     if parser:
-        parser.set_data(datestamp=data['datestamp'], json=str(data['json']))
+        parser.set_data(datestamp=datetime.strptime(data['datestamp'][:-7], format), json=str(data['json']))
         api_resp['success'] = True
     else:
         api_resp['success'] = False
 
     return jsonify(api_resp)
-    # return jsonify({
-    #     'token': data['token']
-    #     })

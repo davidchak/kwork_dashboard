@@ -33,7 +33,6 @@ def login():
     return render_template('login.html', form = form)
 
 
-# Выход
 @auth.route("/logout")
 def logout():
     user = User.query.filter_by(name = current_user.name).first()

@@ -11,13 +11,12 @@ client_token_auth = HTTPTokenAuth()
 
 parser_token_auth = HTTPTokenAuth()
 
-# Авторизация для клиентов по токену
-# Пропускает если учетка активна 
+
 @client_token_auth.verify_token
 def verify_token(token):
     client = Client.query.filter_by(token=token).first()
     if client and client.active:
-        # if client.token_expiration < datetime.utcnow():
+
         if client.token_expiration < datetime.now():
             resp = make_response(jsonify({'error':'The key has expired!'}))
             resp.headers ['Content-Type'] = 'application/json'
@@ -36,8 +35,7 @@ def token_auth_error():
 
 @parser_token_auth.verify_token
 def verify_token(token):
-    # g.current_user = Parser.check_token(token) if token else None
-    # return g.current_user is not None
+
     parser = Parser.query.filter_by(token=token).first()
     if not parser:
         return None

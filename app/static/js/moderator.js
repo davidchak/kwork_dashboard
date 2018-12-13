@@ -1,4 +1,3 @@
-// Добавление нового пользователя
 function add_client() {
     el = $('#input_new_client_name')[0];
     if (el.value === "" || el.value === undefined) {
@@ -47,7 +46,6 @@ function add_client() {
 }
 
 
-// Активация или деактивация пользователя
 function activ_deactiv_client(id) {
     $.ajax({
         data: {
@@ -76,7 +74,6 @@ function activ_deactiv_client(id) {
 }
 
 
-// Удаление клиента
 function del_client(id) {
     $.ajax({
         data: {
@@ -99,7 +96,6 @@ function del_client(id) {
 }
 
 
-// Продление токена
 function update_token_expiration(id) {
     count = $('#input_count_' + id)[0];
     token_expiration = $('#dc_client_token_expiration_'+ id)[0];
@@ -127,9 +123,6 @@ function update_token_expiration(id) {
 }
 
 
-
-// Обновление счетчика
-// function update_counter() {
 function update_counters() {
     $.get({
         url: '/dash/v1.0/get_moderator_counters',

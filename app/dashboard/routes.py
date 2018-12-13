@@ -8,8 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app import db
 from app.models import Data, User, Parser, Client, Role
 
-# Готово
-# Главная пустая
+
 @dashboard.route('/', methods=['GET'])
 @login_required
 def get_index_page():
@@ -21,8 +20,7 @@ def get_index_page():
     else:
         return redirect(url_for('auth.login'))
 
-# Готово
-# Админка
+
 @dashboard.route('/admin_panel/<username>', methods=['GET', 'POST'])
 @login_required
 @roles_required('admin')
@@ -42,7 +40,7 @@ def get_admin_page(username):
     return render_template('admin.html', clients=clients, users=users, parsers=parsers, clients_count=clients_count, parsers_count=parsers_count, moderators_count=moderators_count, admins_count=admins_count)
 
 
-# Парсер
+
 @dashboard.route('/admin_panel/parsers/<id>', methods=['GET', 'POST'])
 @login_required
 @roles_required('admin')
@@ -56,9 +54,6 @@ def get_parser_data(id):
         abort(404)
         
 
-
-# Готово
-# Модераторка
 @dashboard.route('/moderator_panel/<username>', methods=['GET', 'POST'])
 @login_required
 @roles_required('moderator')
@@ -69,37 +64,6 @@ def get_moderator_page(username):
     return render_template('moderator.html', clients=clients)
 
 
-
-############################################################################################################
-#     API для личного кабинета
-############################################################################################################
-# Добавление пользователя                 /dash/v1.0/user/add_user                        - для авторизованного админа
-# Удаление пользователя                   /dash/v1.0/user/del_user                        - для авторизованного админа
-# Актив/деактив пользователя              /dash/v1.0/activ_deactiv_user                   - для авторизованного админа
-#
-# Добавление парсера                      /dash/v1.0/parser/add_parser                    - для авторизованного админа
-# Удаление парсера                        /dash/v1.0/parser/del_parser                    - для авторизованного админа
-# Получение n-последних записеё парсера   /dash/v1.0/parser/get_last_query/<int>          - для авторизованного админа
-#
-# Добавление клиента                      /dash/v1.0/client/add_client                    - для авторизованного админа или модератора
-# Удаление клиента                        /dash/v1.0/client/del_client                    - для авторизованного админа или модератора
-#
-# Получение количества зарег.             /dash/v1.0/dashboard/get_admin_counters  - для авторизованного админа
-# Получение количества зарег.             /dash/v1.0/dashboard/get_moderator_counters  - для авторизованного админа
-#
-#
-# Формат ответа сервера(api):
-# api_resp = {
-#     'url': '/api/v1.0/add_user',      - url запроса
-#     'method': 'POST',                 - метод запроса
-#     'success': True,                  - результат выполнения
-#     'resp_data': 'data'               - ответ сервера(если нужены какие-либо данные)
-#     'error': 'Error'                  - ошибки, если они были
-# }
-
-
-# Готово
-# Добавление пользователя 
 @dashboard.route('/dash/v1.0/add_user', methods=['POST'])
 @roles_required('admin')
 def add_user():
@@ -159,8 +123,6 @@ def add_user():
     return jsonify(api_resp)
 
 
-# Готово
-# Удаление пользователя 
 @dashboard.route('/dash/v1.0/del_user', methods=['POST'])
 @roles_required('admin')
 def del_user():
@@ -192,8 +154,6 @@ def del_user():
     return jsonify(api_resp)
 
 
-# Готово
-# Активация/деактивация пользователя 
 @dashboard.route('/dash/v1.0/activ_deactiv_user', methods=['POST'])
 @roles_required('admin')
 def activ_deactiv_user():
@@ -228,8 +188,6 @@ def activ_deactiv_user():
     return jsonify(api_resp)
 
 
-# Готово
-# Добавление парсера 
 @dashboard.route('/dash/v1.0/add_parser', methods=['POST'])
 @roles_required('admin')
 def add_parser():
@@ -274,8 +232,6 @@ def add_parser():
     return jsonify(api_resp)
 
 
-# Готово
-# Удаление парсера 
 @dashboard.route('/dash/v1.0/del_parser', methods=['POST'])
 @roles_required('admin')
 def del_parser():
@@ -308,8 +264,6 @@ def del_parser():
     return jsonify(api_resp)
 
 
-# Готово
-# Добавление клиента 
 @dashboard.route('/dash/v1.0/add_client', methods=['POST'])
 @roles_accepted('moderator', 'admin')
 def add_client():
@@ -345,8 +299,6 @@ def add_client():
     return jsonify(api_resp)
 
 
-# Готово
-# Удаление клиента 
 @dashboard.route('/dash/v1.0/del_client', methods=['POST'])
 @roles_accepted('admin', 'moderator')
 def del_client():
@@ -378,8 +330,6 @@ def del_client():
     return jsonify(api_resp)
 
 
-# Готово
-# Продление токена клиента 
 @dashboard.route('/dash/v1.0/update_client_token', methods=['POST'])
 @roles_accepted('admin', 'moderator')
 def update_client_token():
@@ -413,8 +363,6 @@ def update_client_token():
     return jsonify(api_resp)
 
 
-# Готово
-# Активация/деактивация клиента 
 @dashboard.route('/dash/v1.0/activ_deactiv_client', methods=['POST'])
 @roles_required('moderator')
 def activ_deactiv_client():
@@ -446,8 +394,6 @@ def activ_deactiv_client():
     return jsonify(api_resp)
 
 
-# Готово
-# Получение счетчиков для модератора
 @dashboard.route('/dash/v1.0/get_moderator_counters', methods=['GET'])
 @roles_required('moderator')
 def get_moderator_counters():
@@ -480,8 +426,6 @@ def get_moderator_counters():
     return jsonify(api_resp)
 
 
-# Готово
-# Получение счетчиков для админа
 @dashboard.route('/dash/v1.0/get_admin_counters', methods=['GET'])
 @roles_required('admin')
 def get_admin_counters():
@@ -522,37 +466,6 @@ def get_admin_counters():
 
     return jsonify(api_resp)
 
-
-    #     clients = Client.query.all()
-    #     parsers = Parser.query.all()
-    #     moderators = db.session.query(User).filter(User.roles.contains(moderators_role)).all()
-    #     users = User.query.all()
-    #     user_list = []
-    #     for user in users:
-    #         user_list.append({
-    #             'id': user.id,
-    #             'name': user.name,
-    #             'active': user.active,
-    #             'last_login': user.last_login_at,
-    #             'last_logout': user.last_logout_at,
-    #         })
-        
-
-    #     resp_data = {
-    #         'moderators_count': moderators_count,
-    #         'parsers_count': parsers_count,
-    #         'clients_count': clients_count,
-    #         'users': user_list
-    #         }
-        
-    #     api_resp['data'] = resp_data
-    #     api_resp['success'] = True
-        
-    # except Exception as err:
-    #     api_resp['success'] = False
-    #     api_resp['error'] = 'Response data error'
-
-    # return jsonify(api_resp)
 
 
 

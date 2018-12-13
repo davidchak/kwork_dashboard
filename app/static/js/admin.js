@@ -1,4 +1,3 @@
-// Удаление пользователя
 function del_user(id){
     $.ajax({
         data: {
@@ -20,7 +19,7 @@ function del_user(id){
     )
 }
 
-// Активация или деактивация пользователя
+
 function activ_deactiv_user(id) {
     $.ajax({
         data: {
@@ -49,7 +48,6 @@ function activ_deactiv_user(id) {
 }
 
 
-// Добавление нового пользователя
 function add_user() {
     login = $('#input_new_user_login')[0];
     password = $('#input_new_user_password')[0];
@@ -101,7 +99,6 @@ function add_user() {
 }
 
 
-// Добавление нового парсера
 function add_parser() {
     parser_name = $('#input_new_parser')[0];
 
@@ -140,7 +137,6 @@ function add_parser() {
 }
 
 
-// Удаление парсера
 function del_parser(id) {
     $.ajax({
         data: {
@@ -163,7 +159,6 @@ function del_parser(id) {
 }
 
 
-// Обновление счетчиков
 function update_counters(){
     $.get({
         url: '/dash/v1.0/get_admin_counters',
