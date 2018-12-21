@@ -9,63 +9,102 @@ from app import db
 from app.models import Data, User, Parser, Client, Role
 
 
+
+#####################################################################################################
+#   URL                     Описание                Права доступа                      Метод        #
+#---------------------------------------------------------------------------------------------------#
+#   /root/<id>          - Главный юзер              root                               GET          #
+#   /admin/<id>         - Администратор             root, admin                        GET          #
+#   /moderator/<id>     - Модератор                 root, admin, moderator             GET          #
+#   /client/<id>        - Клиент                    root, admin, moderator, client     GET          #
+#   /parser/<id>        - Парсер                    root, admin                        GET          #
+#                                                                                                   #
+#####################################################################################################
+
 @dashboard.route('/', methods=['GET'])
 @login_required
 def get_index_page():
 
-    if current_user.is_authenticated and current_user.has_role('admin'):
-        return redirect(url_for('dashboard.get_admin_page', username=current_user.name))
-    elif current_user.is_authenticated and current_user.has_role('moderator'):
-        return redirect(url_for('dashboard.get_moderator_page', username=current_user.name))
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard.get_user_page', id=current_user.id))
     else:
         return redirect(url_for('auth.login'))
 
 
-@dashboard.route('/admin_panel/<username>', methods=['GET', 'POST'])
+# Страница пользоватлея
+@dashboard.route('/user/<id>', methods=['GET'])
 @login_required
-@roles_required('admin')
-def get_admin_page(username):
+@roles_accepted('root', 'admin', 'moderator')
+def get_user_page(id):
+
+    if current_user.has_role('root'):
+        
+        users = User.query.all()
+        parsers = Parser.query.all()
+        clients = Client.query.all()
+        # clients_count = Client.query.count()
+        # parsers_count = Parser.query.count()
+        # admins_role = Role.query.filter_by(name='admin').first()
+        # admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
+        # moderators_role = Role.query.filter_by(name='moderator').first()
+        # moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
+
+        return render_template('common.html', users=users, parsers=parsers, clients=clients)
     
-    users = User.query.all()
-    parsers = Parser.query.all()
-    clients = Client.query.all()
-    clients_count = Client.query.count()
-    parsers_count = Parser.query.count()
+    elif current_user.has_role('admin'):
+        users = User.query.filter_by(parent_id = current_user.id).all()
+        parsers = Parser.query.filter_by(parent_id = current_user.id).all()
+        # return render_template('common.html', users=users, parsers=parsers, clients=clients)
+        return render_template('common.html', users=users, parsers=parsers)
     
-    admins_role = Role.query.filter_by(name='admin').first()
-    admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
-    moderators_role = Role.query.filter_by(name='moderator').first()
-    moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
-
-    return render_template('admin.html', clients=clients, users=users, parsers=parsers, clients_count=clients_count, parsers_count=parsers_count, moderators_count=moderators_count, admins_count=admins_count)
-
-
-
-@dashboard.route('/admin_panel/parsers/<id>', methods=['GET', 'POST'])
-@login_required
-@roles_required('admin')
-def get_parser_data(id):
-
-    parser = Parser.query.filter_by(id = id).first()
-    if parser:
-        parser_dict = parser.to_dict()
-        return render_template('parser.html', parser_dict=parser_dict)
+    elif current_user.has_role('moderator'):
+        # return render_template('common.html', clients=clients)
+        return render_template('common.html')
+    
     else:
         abort(404)
-        
 
-@dashboard.route('/moderator_panel/<username>', methods=['GET', 'POST'])
+
+# Страница парсера
+@dashboard.route('/parser/<id>', methods=['GET'])
 @login_required
-@roles_required('moderator')
-def get_moderator_page(username):
+@roles_accepted('root', 'admin', 'moderator')
+def get_parser_page(id):
 
-    clients = Client.query.filter_by(user_id = current_user.id).all()
+    parser = Parser.query.filter_by(id = id).first()
 
-    return render_template('moderator.html', clients=clients)
+    if parser:
+        parser_dict = parser.to_dict(current_user.id)
+    
+        if parser_dict is not None:
+            return render_template('parser.html', parser_dict=parser_dict)
+        else:
+            abort(404)
+    else:
+        abort(404)
 
+#####################################################################################################
+#                                           ERRORS PAGE                                             #
+#####################################################################################################
+
+@dashboard.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+
+@dashboard.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return render_template('500.html'), 500
+
+
+
+#####################################################################################################
+#                                           DASH API                                                #
+#####################################################################################################
 
 @dashboard.route('/dash/v1.0/add_user', methods=['POST'])
-@roles_required('admin')
+@roles_accepted('moderator', 'admin', 'root')
 def add_user():
 
     api_resp = {
@@ -93,6 +132,7 @@ def add_user():
 
     user = current_app.user_datastore.create_user(name=username)
     user.password_hash = generate_password_hash(password)
+    user.parent_id = current_user.id
     
     try:
         db.session.commit()
@@ -124,7 +164,7 @@ def add_user():
 
 
 @dashboard.route('/dash/v1.0/del_user', methods=['POST'])
-@roles_required('admin')
+@roles_accepted('root', 'admin')
 def del_user():
 
     api_resp = {
@@ -155,7 +195,7 @@ def del_user():
 
 
 @dashboard.route('/dash/v1.0/activ_deactiv_user', methods=['POST'])
-@roles_required('admin')
+@roles_accepted('root', 'admin')
 def activ_deactiv_user():
 
     api_resp = {
@@ -189,7 +229,7 @@ def activ_deactiv_user():
 
 
 @dashboard.route('/dash/v1.0/add_parser', methods=['POST'])
-@roles_required('admin')
+@roles_accepted('root', 'admin')
 def add_parser():
     
 
@@ -217,6 +257,7 @@ def add_parser():
 
     new_parser = Parser(name=parser_name)
     new_parser.get_token()
+    new_parser.parent_id = current_user.id
 
     try:
         db.session.add(new_parser)
@@ -233,7 +274,7 @@ def add_parser():
 
 
 @dashboard.route('/dash/v1.0/del_parser', methods=['POST'])
-@roles_required('admin')
+@roles_accepted('root', 'admin')
 def del_parser():
 
     api_resp = {
@@ -265,7 +306,7 @@ def del_parser():
 
 
 @dashboard.route('/dash/v1.0/add_client', methods=['POST'])
-@roles_accepted('moderator', 'admin')
+@roles_accepted('moderator', 'admin', 'root')
 def add_client():
 
     api_resp = {
@@ -300,7 +341,7 @@ def add_client():
 
 
 @dashboard.route('/dash/v1.0/del_client', methods=['POST'])
-@roles_accepted('admin', 'moderator')
+@roles_accepted('moderator', 'admin', 'root')
 def del_client():
 
     api_resp = {
@@ -331,7 +372,7 @@ def del_client():
 
 
 @dashboard.route('/dash/v1.0/update_client_token', methods=['POST'])
-@roles_accepted('admin', 'moderator')
+@roles_accepted('moderator', 'admin', 'root')
 def update_client_token():
 
     api_resp = {
@@ -426,6 +467,49 @@ def get_moderator_counters():
     return jsonify(api_resp)
 
 
+@dashboard.route('/dash/v1.0/get_root_counters', methods=['GET'])
+@roles_required('root')
+def get_root_counters():
+    
+    api_resp = {
+        'url': '',     
+        'method': '',                 
+        'success': True,                 
+        'resp_data': '',               
+        'error': ''                
+    }
+
+    api_resp['url'] = '/dash/v1.0/get_root_counters'
+    api_resp['method'] = 'GET'
+    
+    try:
+        parsers_count = Parser.query.count()
+        moderators_role = Role.query.filter_by(name='moderator').first()
+        admins_role = Role.query.filter_by(name='admin').first()
+        admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
+        moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
+        clients_count = Client.query.count()
+        
+
+        resp_data = {
+            'moderators_count': moderators_count,
+            'parsers_count': parsers_count,
+            'clients_count': clients_count,
+            'admins_count': admins_count
+        }
+        
+        api_resp['data'] = resp_data
+        api_resp['success'] = True
+        
+    except Exception as err:
+        api_resp['success'] = False
+        api_resp['error'] = 'Ошибка получения счетчиков'
+
+    return jsonify(api_resp)
+
+
+
+
 @dashboard.route('/dash/v1.0/get_admin_counters', methods=['GET'])
 @roles_required('admin')
 def get_admin_counters():
@@ -465,7 +549,3 @@ def get_admin_counters():
         api_resp['error'] = 'Ошибка получения счетчиков'
 
     return jsonify(api_resp)
-
-
-
-

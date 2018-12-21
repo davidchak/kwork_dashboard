@@ -1,0 +1,42 @@
+<div class="row my-5 mx-3">
+    <table class="table table-bordered table-hover table-sm">
+        <thead class="thead-light">
+            <tr class="bg-primary">
+                <td id="parsers_table" class="text-white" colspan="5">Парсеры</td>
+            </tr>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Имя</th>
+                <th scope="col" class="text-center">Токен</th>
+                <th scope="col" class="text-center">Действия</th>
+            </tr>
+        </thead>
+        <tbody id="dc-parsers-table">
+            {% if parsers %}
+            {% for parser in parsers %}
+            <tr id="parser_row_{{ parser.id }}">
+                <th scope="row">{{ parser.id }}</th>
+                <td><a href="/parser/{{ parser.id }}">{{ parser.name }}</a></td>
+                <td class="text-center">{{ parser.token }}</td>
+                <td class="text-center">
+                    <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_parser( {{ parser.id }} )">Удалить</button>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </tbody>
+        <tr class="table-active">
+            <td class="text-white" colspan="7">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="">Имя</span>
+                    </div>
+                    <input id="input_new_parser" type="text" class="form-control">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary " type="button" id="button-addon2" onclick="add_parser()">Создать</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

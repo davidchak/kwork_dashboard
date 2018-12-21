@@ -3,12 +3,8 @@
         aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    {% if current_user.has_role('admin') %}
-        <a class="navbar-brand" href="{{ url_for('dashboard.get_admin_page', username=current_user.name) }}">{{ current_user.name }}</a>
-    
-    {% else %}
-        <a class="navbar-brand" href="{{ url_for('dashboard.get_moderator_page',  username=current_user.name) }}">{{ current_user.name }}</a>
-    {% endif %}
+
+    <a class="navbar-brand" href="{{ url_for('dashboard.get_user_page', id=current_user.id) }}">{{ current_user.name | capitalize()}}</a>
     
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         

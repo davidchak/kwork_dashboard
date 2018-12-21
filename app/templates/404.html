@@ -1,14 +1,32 @@
 {% extends "base.html" %}
 
 {% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
 {% endblock %}
 
 {% block content %}
-{% include 'menu.html' %}
 
-<div class="container">
-    <h4>404</h4>
-    <h2>PAGE NOT FOUND</h2>
-</div>
+    {% include 'sub-templates/_menu.html' %}
+
+    <div class="row my-5 mx-5">
+        <table class="table table-bordered table-hover table-sm">
+            <thead class="thead-light">
+                <tr class="bg-primary">
+                    <td class="text-white text-center">
+                        <h2>ERROR 404</h2>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" class="text-center">
+                        <h1>PAGE NOT FOUND</h1>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
+
+

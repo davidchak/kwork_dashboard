@@ -1,0 +1,47 @@
+<div class="row my-5 mx-3">
+    <table class="table table-bordered table-hover table-sm">
+        <thead class="thead-light">
+            <tr class="bg-primary">
+                <td id="clients_table" class="text-white" colspan="7">Клиенты</td>
+            </tr>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Создатель</th>
+                <th scope="col" class="text-center">Активен</th>
+                <th scope="col" class="text-center">Токен</th>
+                <th scope="col" class="text-center">Действует до</th>
+                <th scope="col" class="text-center">Последний вход</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if clients %}
+            {% for client in clients %}
+            <tr id="{{ client.id }}">
+                <th scope="row">{{ client.id }}</th>
+                <td>{{ client.name }}</td>
+                <td>{{ client.user.name }}</td>
+                <td class="text-center">{{ client.active }}</td>
+                <td class="text-center">{{ client.token }}</td>
+                <td class="text-center">{{ client.token_expiration }}</td>
+                <td class="text-center">{{ client.last_login_at }}</td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </tbody>
+        <tr class="table-active">
+            <td class="text-white" colspan="7">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="">Имя</span>
+                    </div>
+                    <input id="input_new_parser" type="text" class="form-control">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary " type="button" id="button-addon2" onclick="">Создать</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+</div>

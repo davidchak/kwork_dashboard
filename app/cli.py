@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
-
 def register(app):
 
     @app.cli.group()
@@ -22,9 +21,14 @@ def register(app):
         db.drop_all()
         db.create_all()
 
+        u0 = app.user_datastore.create_user(name='root')
+        u0.password_hash = generate_password_hash('root')
+        r0 = app.user_datastore.create_role(name='root')
+        
         u1 = app.user_datastore.create_user(name='admin')
         u1.password_hash = generate_password_hash('admin')
         r1 = app.user_datastore.create_role(name='admin')
+        
         u2 = app.user_datastore.create_user(name='moderator')
         u2.password_hash = generate_password_hash('moderator')
         r2 = app.user_datastore.create_role(name='moderator')
@@ -34,7 +38,11 @@ def register(app):
         except Exception as err:
             db.session.rollback()
             print('Error: ', err)
-        
+            
+        u0.parent_id = u0.id
+        u1.parent_id = u0.id
+        u2.parent_id = u1.id
+        app.user_datastore.add_role_to_user(u0, r0)
         app.user_datastore.add_role_to_user(u1, r1)
         app.user_datastore.add_role_to_user(u2, r2)
         

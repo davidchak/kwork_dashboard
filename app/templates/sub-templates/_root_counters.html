@@ -1,0 +1,78 @@
+<div class="container-fluid">
+    <div class="row my-3">
+        <div class="col">
+            <div class="col">
+                <div class="card border-primary text-center">
+                    <div class="card-header text-primary"><a class="nav-item mx-2" href="#moderators_table">Администраторы</a></div>
+                    <div class="card-body text-primary">
+                        {% if admins_count %}
+                        <h1 id="admins_count" class="card-title">
+                            {{ admins_count }}
+                        </h1>
+                        {% else %}
+                        <h1 id="moderators_count" class="card-title">0</h1>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="col">
+                <div class="card border-primary text-center">
+                    <div class="card-header text-primary"><a class="nav-item mx-2" href="#moderators_table">Модераторы</a></div>
+                    <div class="card-body text-primary">
+                        {% if moderators_count %}
+                        <h1 id="moderators_count" class="card-title">
+                            {{ moderators_count }}
+                        </h1>
+                        {% else %}
+                        <h1 id="moderators_count" class="card-title">0</h1>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col">
+            <div class="col">
+                <div class="card border-primary text-center">
+                    <div class="card-header text-primary"><a class="nav-item mx-2" href="#parsers_table">Парсеры</a></div>
+                    <div class="card-body text-primary">
+                        {% if parsers_count %}
+                        <h1 id="parsers_count" class="card-title">
+                            {{ parsers_count }}
+                        </h1>
+                        {% else %}
+                        <h1 id="parsers_count" class="card-title">0</h1>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col">
+            <div class="col">
+                <div class="card border-primary text-center">
+                    <div class="card-header text-primary"><a class="nav-item mx-2" href="#clients_table">Клиенты</a></div>
+                    <div class="card-body text-primary">
+                        {% if clients_count %}
+                        <h1 id="clients_count" class="card-title">
+                            {{ clients_count }}
+                        </h1>
+                        {% else %}
+                        <h1 id="clients_count" class="card-title">
+                            0
+                        </h1>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>

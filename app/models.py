@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import Required
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_security import RoleMixin, UserMixin
+from flask_security import RoleMixin, UserMixin, current_user
 from app import db, login
 import time
 from datetime import datetime, timedelta
@@ -35,6 +35,7 @@ class User(UserMixin, db.Model):
     clinets = db.relationship('Client', backref='user', lazy='dynamic')
     last_login_at = db.Column(db.DateTime())
     last_logout_at = db.Column(db.DateTime())
+    parent_id = db.Column(db.Integer)
 
     def get_client_count(self):
         count = Client.query.filter_by(user=self).count()
@@ -85,12 +86,11 @@ class User(UserMixin, db.Model):
 
 
 class Role(db.Model, RoleMixin):
-
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True)
     description = db.Column(db.String(255))
     users = db.relationship('User', secondary=roles_users, backref=db.backref('roles', lazy='dynamic'))
-
 
 class Data(db.Model):
 
@@ -110,6 +110,7 @@ class Parser(db.Model):
     name = db.Column(db.String)
     data = db.relationship('Data', backref='parser', lazy='dynamic')
     token = db.Column(db.String(32), index=True, unique=True)
+    parent_id = db.Column(db.Integer)
 
     def get_token(self, expires_in=432000):
         now = datetime.utcnow()
@@ -120,22 +121,26 @@ class Parser(db.Model):
         return self.token
 
 
-    def to_dict(self):
-        parser_data = []
-        for i in self.data:
-            parser_data.append({
-                'id': i.id,
-                'datestamp': i.datestamp,
-                'json': i.json
-            })
-        data = {
-            'id': self.id,
-            'name': self.name,
-            'token': self.token,
-            'data': parser_data
-        } 
+    def to_dict(self, parent_id):
+        if self.parent_id == parent_id or parent_id == 1:
+            parser_data = []
+            for i in self.data:
+                parser_data.append({
+                    'id': i.id,
+                    'datestamp': i.datestamp,
+                    'json': i.json
+                })
+            data = {
+                'id': self.id,
+                'name': self.name,
+                'token': self.token,
+                'data': parser_data
+            } 
+        else:
+            data = None
+        
         return data
-    
+
     def set_data(self, datestamp, json):
         data = Data()
         data.datestamp = datestamp

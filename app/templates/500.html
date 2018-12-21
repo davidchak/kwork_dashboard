@@ -1,14 +1,32 @@
-500{% extends "base.html" %}
+{% extends "base.html" %}
 
 {% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
 {% endblock %}
 
 {% block content %}
-{% include 'menu.html' %}
 
-<div class="container">
-    <h4>500</h4>
-    <h2>INTERNAL SERVER ERROR</h2>
-</div>
+    {% include 'sub-templates/_menu.html' %}
 
+    <div class="row my-5 mx-5">
+        <table class="table table-bordered table-hover table-sm">
+            <thead class="thead-light">
+                <tr class="bg-primary">
+                    <td class="text-white text-center"> 
+                        <h2>ERROR 500</h2>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" class="text-center">
+                        <h1>INTERNAL SERVER ERROR</h1>
+                    </th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
 {% endblock %}
+
+

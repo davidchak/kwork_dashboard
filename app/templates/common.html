@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    {% include 'sub-templates/_menu.html' %}
+    
+    {% if current_user.has_role('root') or current_user.has_role('admin') %}
+
+        {% include 'sub-templates/_users_table.html' %}
+
+        {% include 'sub-templates/_parsers_table.html' %}
+
+        {% include 'sub-templates/_clients_table.html' %}
+    
+    {% elif current_user.has_role('moderator') %}
+        
+        {% include 'sub-templates/_clients_table.html' %}
+    
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+{% endblock %}
+

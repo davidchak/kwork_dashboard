@@ -1,0 +1,32 @@
+<div class="container-fluid">
+
+    <div class="row my-3 mx-1">
+
+        <div class="card-deck m-auto w-100">
+
+            <div class="card border-primary text-center w-40">
+                <div class="card-header text-primary">Клиенты</div>
+                <div class="card-body">
+                    {% if clients %}
+                    <h1 id="clients_count" class="card-title"> {{ clients|count }}</h1>
+                    {% else %}
+                    <h1 id="clients_count" class="card-title">0</h1>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card border-primary text-center w-60">
+                <div class="card-header text-primary">Новый клиент</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-8 col-lg-10">
+                            <input id="input_new_client_name" type="text" class="form-control mt-2" , placeholder="Клиент"></input>
+                        </div>
+                        <div class="col-sm-6 col-md-4 col-lg-2">
+                            <button class="dc-circle-btn btn btn-lg btn-primary mr-2" onclick="add_client()">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
