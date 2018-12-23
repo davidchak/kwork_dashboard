@@ -161,6 +161,7 @@ class Client(db.Model):
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
     last_login_at = db.Column(db.DateTime())
+    parent_id = db.Column(db.Integer)
 
 
     def get_token(self, expires_in=10):

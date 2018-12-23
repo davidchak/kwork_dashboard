@@ -325,6 +325,7 @@ def add_client():
     new_client = Client(name=name)
     new_client.user = current_user
     new_client.get_token()
+    new_client.parent_id = current_user.parent_id
     
     try:
         db.session.add(new_client)

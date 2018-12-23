@@ -13,16 +13,16 @@
         </thead>
         <tbody id="dc-parsers-table">
             {% if parsers %}
-            {% for parser in parsers %}
-            <tr id="parser_row_{{ parser.id }}">
-                <th scope="row">{{ parser.id }}</th>
-                <td><a href="/parser/{{ parser.id }}">{{ parser.name }}</a></td>
-                <td class="text-center">{{ parser.token }}</td>
-                <td class="text-center">
-                    <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_parser( {{ parser.id }} )">Удалить</button>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for parser in parsers %}
+                <tr id="parser_row_{{ parser.id }}">
+                    <th scope="row">{{ parser.id }}</th>
+                    <td><a href="/parser/{{ parser.id }}">{{ parser.name }}</a></td>
+                    <td class="text-center">{{ parser.token }}</td>
+                    <td class="text-center">
+                        <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_parser( {{ parser.id }} )">Удалить</button>
+                    </td>
+                </tr>
+                {% endfor %}
             {% endif %}
         </tbody>
         <tr class="table-active">
