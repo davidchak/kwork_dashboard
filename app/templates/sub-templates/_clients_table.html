@@ -2,7 +2,7 @@
     <table class="table table-bordered table-hover table-sm">
         <thead class="thead-light">
             <tr class="bg-primary">
-                <td id="clients_table" class="text-white" colspan="8">Клиенты</td>
+                <td id="clients_table" class="text-white" colspan="9">Клиенты</td>
             </tr>
             <tr>
                 <th scope="col">#</th>
@@ -12,21 +12,30 @@
                 <th scope="col" class="text-center">Токен</th>
                 <th scope="col" class="text-center">Действует до</th>
                 <th scope="col" class="text-center">Последний вход</th>
-                <th scope="col" class="text-center">Действия</th>
+                <th scope="col" class="text-center" colspan="2">Действия</th>
             </tr>
         </thead>
         <tbody id="dc-clients-table">
             {% if clients %}
                 {% for client in clients %}
-                <tr id="{{ client.id }}">
+                <tr id="client_row_{{ client.id }}">
                     <th scope="row">{{ client.id }}</th>
                     <td>{{ client.name }}</td>
-                    <td>{{ client.user.name }}</td>
-                    <td class="text-center">{{ client.active }}</td>
+                    <td>{{ client.owner.name }}</td>
+                    <td class="text-center dc_client_status">{{ client.active }}</td>
                     <td class="text-center">{{ client.token }}</td>
                     <td class="text-center">{{ client.token_expiration }}</td>
                     <td class="text-center">{{ client.last_login_at }}</td>
-                    <td class="text-center"> \
+                    <td class="text-center"> 
+                        <div class="input-group"> 
+                            <input id="input_count_'+ data['resp_data']['id'] + '" type="number" class="form-control form-control-sm" style="max-width:60px;"
+                                aria-describedby="button-addon2" /> 
+                            <div class="input-group-append"> 
+                                <button class="btn btn-sm btn-outline-secondary" type="button" id="button-addon2" onclick="update_token_expiration({{ client.id }})">Продлить</button>
+                            </div> 
+                        </div> 
+                    </td>
+                    <td class="text-center"> 
                         <button class="btn btn-sm btn-outline-warning mr-2" onclick="activ_deactiv_client({{ client.id }})">Деактивировать</button>
                         <button class="btn btn-sm btn-outline-danger mr-2" onclick="del_client({{ client.id }})">Удалить</button>
                     </td>
@@ -35,7 +44,7 @@
             {% endif %}
         </tbody>
         <tr class="table-active">
-            <td class="text-white" colspan="8">
+            <td class="text-white" colspan="9">
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="">Имя</span>

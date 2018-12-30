@@ -32,10 +32,12 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), default=None)
     active = db.Column(db.Boolean, default=True)
-    clinets = db.relationship('Client', backref='user', lazy='dynamic')
+    clients = db.relationship('Client', backref='owner', lazy='dynamic')
+    parsers = db.relationship('Parser', backref='owner', lazy='dynamic')
     last_login_at = db.Column(db.DateTime())
     last_logout_at = db.Column(db.DateTime())
     parent_id = db.Column(db.Integer)
+    
 
     def get_client_count(self):
         count = Client.query.filter_by(user=self).count()
@@ -110,7 +112,7 @@ class Parser(db.Model):
     name = db.Column(db.String)
     data = db.relationship('Data', backref='parser', lazy='dynamic')
     token = db.Column(db.String(32), index=True, unique=True)
-    parent_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     def get_token(self, expires_in=432000):
         now = datetime.utcnow()
@@ -120,9 +122,17 @@ class Parser(db.Model):
         db.session.add(self)
         return self.token
 
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'token': self.token,
+            'owner': User.query.filter_by(id=self.user_id).first().name
+        }
+        return data 
 
-    def to_dict(self, parent_id):
-        if self.parent_id == parent_id or parent_id == 1:
+    def to_dict_with_data(self):
+        if self.user_id == current_user.id or current_user.name == 'root':
             parser_data = []
             for i in self.data:
                 parser_data.append({
@@ -133,6 +143,7 @@ class Parser(db.Model):
             data = {
                 'id': self.id,
                 'name': self.name,
+                'owner': self.owner.name,
                 'token': self.token,
                 'data': parser_data
             } 
@@ -157,11 +168,10 @@ class Client(db.Model):
     id =  id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
     active = db.Column(db.Boolean, default=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
     last_login_at = db.Column(db.DateTime())
-    parent_id = db.Column(db.Integer)
 
 
     def get_token(self, expires_in=10):
@@ -188,6 +198,7 @@ class Client(db.Model):
             'name': self.name,
             'active': self.active,
             'token': self.token,
+            'owner': User.query.filter_by(id=self.user_id).first().name,
             'token_expiration': self.token_expiration
         }
         return data

@@ -121,6 +121,7 @@ function add_parser() {
                 table.append('<tr id="parser_row_' + data['resp_data']['id'] + '"> \
                         <th scope="row">' + data['resp_data']['id'] + '</th> \
                         <td ><a href="/admin_panel/parsers/' + data['resp_data']['id'] + '">' + data['resp_data']['name'] + '</td> \
+                        <td class="text-center">' + data['resp_data']['owner'] + '</td> \
                         <td class="text-center">' + data['resp_data']['token'] + '</td> \
                         <td class="text-center"> \
                             <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_parser( ' + data['resp_data']['id'] + ' )">Удалить</button> \
@@ -221,6 +222,7 @@ function add_client() {
                 table.append('<tr id="client_row_' + data['resp_data']['id'] + '"> \
                         <td class="text-center">'+ data['resp_data']['id'] + '</td> \
                         <td class="text-center">'+ data['resp_data']['name'] + '</td> \
+                        <td class="text-center">'+ data['resp_data']['owner'] + '</td> \
                         <td class="text-center dc_client_status">True</td> \
                         <td class="text-center">'+ data['resp_data']['token'] + '</td> \
                         <td id="dc_client_token_expiration_'+ data['resp_data']['id'] + '" class="text-center">' + data['resp_data']['token_expiration'] + '</td> \

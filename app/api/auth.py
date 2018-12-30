@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from flask import g, Response, abort, jsonify, make_response
-from app.models import Client, Parser
-from flask_httpauth import HTTPTokenAuth
+from app.models import Client, Parser, User
+from flask_httpauth import HTTPTokenAuth, HTTPBasicAuth
 from .errors import error_response
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 client_token_auth = HTTPTokenAuth()
 
 parser_token_auth = HTTPTokenAuth()
+
+users_basic_auth = HTTPBasicAuth()
 
 
 @client_token_auth.verify_token
@@ -40,3 +42,22 @@ def verify_token(token):
     if not parser:
         return None
     return parser
+
+
+# @users_basic_auth.get_password
+# def get_password(username):
+#     users = User.query.all()
+#     if username in users:
+#         return users.get(username)
+#     return None
+
+@users_basic_auth.verify_password
+def verify_password(username, password):
+    g.user = None
+    user = User.query.filter_by(name=username).first()
+    if user is not None and user.active and user.check_password(password):
+        user._update_last_login_time(datetime.now())
+        user._update_last_logout_time(datetime.now() + timedelta(seconds=1))
+        g.user = user
+        return True
+    return False

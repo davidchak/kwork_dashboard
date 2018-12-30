@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block header %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash.css') }}">
+{% endblock %}
+
+{% block content %}
+
+    {% include 'sub-templates/_menu.html' %}
+
+    <div class="row my-5 mx-3">
+
+        <table class="table table-bordered table-hover table-sm">
+            <thead class="thead-light">
+                <tr class="bg-primary">
+                    <td id="parser_data_table" class="text-white" colspan="7">Справка</td>
+                </tr>
+                <tr>
+                    <th scope="col">Url</th>
+                </tr>
+            </thead>
+            <tbody id="dc-users-table">
+                <tr>
+                    <th scope="row">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nemo obcaecati pariatur ratione debitis dolorum at! Consequuntur blanditiis atque veniam dolore harum facilis! Quam sit soluta, repudiandae ducimus ut porro molestias.</th>
+                </tr>
+            </tbody>
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Url</th>
+                </tr>
+            </thead>
+            <tbody id="dc-users-table">
+                <tr>
+                    <th scope="row">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nemo obcaecati pariatur ratione
+                        debitis dolorum at! Consequuntur blanditiis atque veniam dolore harum facilis! Quam sit soluta, repudiandae
+                        ducimus ut porro molestias.</th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+{% endblock %}
+
+

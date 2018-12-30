@@ -5,7 +5,12 @@
     </button>
 
     <a class="navbar-brand" href="{{ url_for('dashboard.get_user_page', id=current_user.id) }}">{{ current_user.name | capitalize()}}</a>
-    
+    {% if menu_list %}
+        {% for item in menu_list %}
+
+        <a class="btn btn-sm btn-outline-warning" href="{{ item.href }}">{{ item.title }}</a>
+        {% endfor %}
+    {% endif %}
     <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
         
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0"></ul>

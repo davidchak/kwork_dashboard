@@ -2,11 +2,12 @@
     <table class="table table-bordered table-hover table-sm">
         <thead class="thead-light">
             <tr class="bg-primary">
-                <td id="parsers_table" class="text-white" colspan="5">Парсеры</td>
+                <td id="parsers_table" class="text-white" colspan="6">Парсеры</td>
             </tr>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Имя</th>
+                <th scope="col">Создатель</th>
                 <th scope="col" class="text-center">Токен</th>
                 <th scope="col" class="text-center">Действия</th>
             </tr>
@@ -17,6 +18,7 @@
                 <tr id="parser_row_{{ parser.id }}">
                     <th scope="row">{{ parser.id }}</th>
                     <td><a href="/parser/{{ parser.id }}">{{ parser.name }}</a></td>
+                    <td class="text-center">{{ parser.owner.name }}</td>
                     <td class="text-center">{{ parser.token }}</td>
                     <td class="text-center">
                         <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_parser( {{ parser.id }} )">Удалить</button>
@@ -26,7 +28,7 @@
             {% endif %}
         </tbody>
         <tr class="table-active">
-            <td class="text-white" colspan="7">
+            <td class="text-white" colspan="6">
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text" id="">Имя</span>

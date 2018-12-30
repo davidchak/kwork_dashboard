@@ -14,3 +14,4 @@ class Config(object):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
     SECURITY_TRACKABLE = True
+    REMEMBER_COOKIE_DURATION = 3600

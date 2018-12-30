@@ -13,7 +13,8 @@ def register(app):
         pass
 
     @system.command()
-    def initdb():
+    @click.argument('passwd')
+    def initdb(passwd):
         """Initialize the database."""
         
         from app import db
@@ -22,15 +23,10 @@ def register(app):
         db.create_all()
 
         u0 = app.user_datastore.create_user(name='root')
-        u0.password_hash = generate_password_hash('root')
+        u0.password_hash = generate_password_hash(passwd)
+        
         r0 = app.user_datastore.create_role(name='root')
-        
-        u1 = app.user_datastore.create_user(name='admin')
-        u1.password_hash = generate_password_hash('admin')
         r1 = app.user_datastore.create_role(name='admin')
-        
-        u2 = app.user_datastore.create_user(name='moderator')
-        u2.password_hash = generate_password_hash('moderator')
         r2 = app.user_datastore.create_role(name='moderator')
 
         try:
@@ -40,12 +36,8 @@ def register(app):
             print('Error: ', err)
             
         u0.parent_id = u0.id
-        u1.parent_id = u0.id
-        u2.parent_id = u1.id
         app.user_datastore.add_role_to_user(u0, r0)
-        app.user_datastore.add_role_to_user(u1, r1)
-        app.user_datastore.add_role_to_user(u2, r2)
-        
+     
         try:
             db.session.commit()
         except Exception as err:
