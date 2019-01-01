@@ -16,7 +16,7 @@
             {% for row in parser_dict['data'] %}
             <tr>
                 <th scope="row">{{ row['id'] }}</th>
-                <td>{{ row['datestamp'] }}</td>
+                <td>{{ moment(row['datestamp']).format('LLL') }}</td>
                 <td>{{ row['json'] }}</td>
             </tr>
             {% endfor %}

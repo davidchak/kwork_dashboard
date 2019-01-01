@@ -44,13 +44,6 @@ def verify_token(token):
     return parser
 
 
-# @users_basic_auth.get_password
-# def get_password(username):
-#     users = User.query.all()
-#     if username in users:
-#         return users.get(username)
-#     return None
-
 @users_basic_auth.verify_password
 def verify_password(username, password):
     g.user = None

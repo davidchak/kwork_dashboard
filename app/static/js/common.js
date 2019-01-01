@@ -217,15 +217,16 @@ function add_client() {
         function (data) {
             console.log(data)
             if (data['success'] === true) {
+            
 
                 table = $('#dc-clients-table')
                 table.append('<tr id="client_row_' + data['resp_data']['id'] + '"> \
                         <td class="text-center">'+ data['resp_data']['id'] + '</td> \
-                        <td class="text-center">'+ data['resp_data']['name'] + '</td> \
-                        <td class="text-center">'+ data['resp_data']['owner'] + '</td> \
+                        <td class="text-left">'+ data['resp_data']['name'] + '</td> \
+                        <td>'+ data['resp_data']['owner'] + '</td> \
                         <td class="text-center dc_client_status">True</td> \
                         <td class="text-center">'+ data['resp_data']['token'] + '</td> \
-                        <td id="dc_client_token_expiration_'+ data['resp_data']['id'] + '" class="text-center">' + data['resp_data']['token_expiration'] + '</td> \
+                        <td id="dc_client_token_expiration_'+ data['resp_data']['id'] + '" class="text-center">' + convert_date(data['resp_data']['token_expiration']) + '</td> \
                         <td class="text-center">None</td> \
                         <td class="text-center"> \
                             <div class="input-group"> \
@@ -318,7 +319,7 @@ function update_token_expiration(id) {
         function (data) {
             console.log(data)
             if (data['success'] === true) {
-                token_expiration.innerText = data['resp_data']['token_expiration']
+                token_expiration.innerText = convert_date(data['resp_data']['token_expiration'])
                 count.value = ""
             } else {
                 alert(data['error'])
@@ -353,3 +354,26 @@ function update_counters() {
 
     )
 } 
+
+
+function convert_date(date_from_server){
+
+    let arr, result
+    dict = {
+        'Jan': '01',
+        'Feb': '02',
+        'Mar': '03',
+        'Apr': '04',
+        'May': '05',
+        'June': '06',
+        'July': '07',
+        'Aug': '08',
+        'Sept': '09',
+        'Oct': '10',
+        'Nov': '11',
+        'Dec': '12'
+    }
+    arr = date_from_server.match(/(^[A-z]+),\s(\d+)\s([A-z]+)\s(\d+)\s(\d+:\d+:\d+)\s(\w+)/)
+    result = arr[2] + '.' + dict[arr[3]] + '.' + arr[4] 
+    return result
+}

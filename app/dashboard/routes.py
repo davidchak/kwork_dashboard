@@ -201,36 +201,37 @@ def add_user():
     return jsonify(api_resp)
 
 
-@dashboard.route('/dash/v1.0/del_user', methods=['POST'])
-@login_required
-@roles_accepted('root', 'admin')
-def del_user():
+# TODO: Передалеать!
+# @dashboard.route('/dash/v1.0/del_user', methods=['POST'])
+# @login_required
+# @roles_accepted('root', 'admin')
+# def del_user():
 
-    api_resp = {
-        'url': '',     
-        'method': '',                 
-        'success': True,                 
-        'resp_data': '',               
-        'error': ''                
-    }
+#     api_resp = {
+#         'url': '',     
+#         'method': '',                 
+#         'success': True,                 
+#         'resp_data': '',               
+#         'error': ''                
+#     }
 
-    user_id = request.form['id']
+#     user_id = request.form['id']
 
-    api_resp['url'] = '/dash/v1.0/del_user'
-    api_resp['method'] = 'POST'
+#     api_resp['url'] = '/dash/v1.0/del_user'
+#     api_resp['method'] = 'POST'
 
     
-    user = User.query.filter_by(id=user_id).first()
-    if user and user.name != current_user.name:
-        try:
-            db.session.delete(user)
-            db.session.commit()
-            api_resp['success'] = True
-        except:
-            api_resp['success'] = False
-            api_resp['error'] = 'Ошибка удаления пользователя!'
+#     user = User.query.filter_by(id=user_id).first()
+#     if user and user.name != current_user.name:
+#         try:
+#             db.session.delete(user)
+#             db.session.commit()
+#             api_resp['success'] = True
+#         except:
+#             api_resp['success'] = False
+#             api_resp['error'] = 'Ошибка удаления пользователя!'
     
-    return jsonify(api_resp)
+#     return jsonify(api_resp)
 
 
 @dashboard.route('/dash/v1.0/activ_deactiv_user', methods=['POST'])
@@ -456,7 +457,7 @@ def update_client_token():
 
 @dashboard.route('/dash/v1.0/activ_deactiv_client', methods=['POST'])
 @login_required
-@roles_required('moderator')
+@roles_accepted('moderator', 'admin', 'root')
 def activ_deactiv_client():
 
     api_resp = {
@@ -474,6 +475,9 @@ def activ_deactiv_client():
 
     
     client = Client.query.filter_by(id=client_id).first()
+    api_resp['resp_data'] = client.name
+
+
     if client:
         client.activ_deactiv_client()
         try:
@@ -482,6 +486,9 @@ def activ_deactiv_client():
         except:
             api_resp['success'] = False
             api_resp['error'] = 'Ошибка активации/деактивации клиента'
+    else:
+        api_resp['success'] = False
+        api_resp['error'] = 'Клиент с таким ID не найден!'
 
     return jsonify(api_resp)
 

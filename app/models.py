@@ -211,6 +211,10 @@ class Client(db.Model):
             self.active = False
         elif self.active == False:
             self.active = True
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
 
 
 class LoginForm(FlaskForm):

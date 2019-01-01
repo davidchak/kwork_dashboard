@@ -24,11 +24,11 @@
                     <td>{{ client.owner.name }}</td>
                     <td class="text-center dc_client_status">{{ client.active }}</td>
                     <td class="text-center">{{ client.token }}</td>
-                    <td class="text-center">{{ client.token_expiration }}</td>
-                    <td class="text-center">{{ client.last_login_at }}</td>
+                    <td id="dc_client_token_expiration_{{ client.id }}" class="text-center">{{ moment(client.token_expiration).format('L') }}</td>
+                    <td class="text-center">{{ moment(client.last_login_at).format('LLL') }}</td>
                     <td class="text-center"> 
                         <div class="input-group"> 
-                            <input id="input_count_'+ data['resp_data']['id'] + '" type="number" class="form-control form-control-sm" style="max-width:60px;"
+                            <input id="input_count_{{ client.id }}" type="number" class="form-control form-control-sm" style="max-width:60px;"
                                 aria-describedby="button-addon2" /> 
                             <div class="input-group-append"> 
                                 <button class="btn btn-sm btn-outline-secondary" type="button" id="button-addon2" onclick="update_token_expiration({{ client.id }})">Продлить</button>
