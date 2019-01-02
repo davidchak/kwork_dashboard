@@ -21,7 +21,7 @@ def login():
             return redirect(url_for('auth.login'))
     
         login_user(user)
-        user._update_last_login_time(datetime.now())
+        user._update_last_login_time(datetime.utcnow())
  
         return redirect(url_for('dashboard.get_user_page', id=user.id))
     
@@ -32,6 +32,6 @@ def login():
 def logout():
 
     user = User.query.filter_by(name = current_user.name).first()
-    user._update_last_logout_time(datetime.now())
+    user._update_last_logout_time(datetime.utcnow())
     logout_user()
     return redirect(url_for('auth.login'))

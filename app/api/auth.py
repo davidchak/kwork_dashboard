@@ -19,12 +19,12 @@ def verify_token(token):
     client = Client.query.filter_by(token=token).first()
     if client and client.active:
 
-        if client.token_expiration < datetime.now():
+        if client.token_expiration < datetime.utcnow():
             resp = make_response(jsonify({'error':'The key has expired!'}))
             resp.headers ['Content-Type'] = 'application/json'
             return abort(resp)
         else:
-            client.update_last_login_time(datetime.now())
+            client.update_last_login_time(datetime.utcnow())
             return client 
     else: 
         return False
@@ -49,8 +49,8 @@ def verify_password(username, password):
     g.user = None
     user = User.query.filter_by(name=username).first()
     if user is not None and user.active and user.check_password(password):
-        user._update_last_login_time(datetime.now())
-        user._update_last_logout_time(datetime.now() + timedelta(seconds=1))
+        user._update_last_login_time(datetime.utcnow())
+        user._update_last_logout_time(datetime.urcnow() + timedelta(seconds=10))
         g.user = user
         return True
     return False

@@ -13,7 +13,7 @@ from datetime import datetime
 ###############################################################################################################
 #                                           Client API                                                        #
 ###############################################################################################################
-@api.route('/api/v1.0/client/get_data/<int:count>', methods=['GET'])
+@api.route('/api/v1.0/clients/get_data/<int:count>', methods=['GET'])
 @client_token_auth.login_required
 def get_client_data(count):
     
@@ -26,7 +26,7 @@ def get_client_data(count):
         'error': ''                
     }
 
-    api_resp['url'] = '/api/v1.0/client/get_data/<count>'
+    api_resp['url'] = '/api/v1.0/clients/get_data/<count>'
     api_resp['method'] = 'GET'
 
     data_list = []
@@ -50,7 +50,7 @@ def get_client_data(count):
 ###############################################################################################################
 #                                           Parser API                                                        #
 ###############################################################################################################
-@api.route('/api/v1.0/parser/set_data', methods=['POST'])
+@api.route('/api/v1.0/parsers/set_data', methods=['POST'])
 @parser_token_auth.login_required
 def set_parser_data():
 
@@ -67,7 +67,7 @@ def set_parser_data():
     data = request.json
 
 
-    api_resp['url'] = '/api/v1.0/parser/set_data'
+    api_resp['url'] = '/api/v1.0/parsers/set_data'
     api_resp['method'] = 'POST'
 
     parser = Parser.query.filter_by(token=data['token']).first()

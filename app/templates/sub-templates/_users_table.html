@@ -17,20 +17,31 @@
         </thead>
         <tbody id="dc-users-table">
             {% if users %}
-            {% for user in users %}
-            <tr id="user_row_{{ user.id }}">
-                <th scope="row">{{ user.id }}</th>
-                <td>{{ user.name }}</td>
-                <td>{{ user.roles[0].name }}</td>
-                <td class="dc_user_status">{{ user.active }}</td>
-                <td class="text-center">{{ moment(user.last_login_at).format('LLL') }}</td>
-                <td class="text-center">{{ moment(user.last_logout_at).format('LLL') }}</td>
-                <td class="text-center">
-                    <button class="btn btn-sm btn-outline-primary mr-2" onclick="activ_deactiv_user( {{ user.id }} )">Актив./Деактив.</button>
-                    <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_user( {{ user.id }} )">Удалить</button>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for user in users %}
+                <tr id="user_row_{{ user.id }}">
+                    <th scope="row">{{ user.id }}</th>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.roles[0].name }}</td>
+                    <td class="dc_user_status">{{ user.active }}</td>
+                    
+                    {% if user.last_login_at %}
+                        <td class="text-center">{{ moment(user.last_login_at).format('LLL') }}</td>
+                    {% else %}
+                        <td class="text-center">None</td>
+                    {% endif %}
+
+                    {% if user.last_logout_at %}
+                        <td class="text-center">{{ moment(user.last_logout_at).format('LLL') }}</td>
+                    {% else %}
+                        <td class="text-center">None</td>
+                    {% endif %}
+                    
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary mr-2" onclick="activ_deactiv_user( {{ user.id }} )">Актив./Деактив.</button>
+                        <button class="del_user_btn btn btn-sm btn-outline-danger mr-2" onclick="del_user( {{ user.id }} )">Удалить</button>
+                    </td>
+                </tr>
+                {% endfor %}
             {% endif %}
 
         </tbody>

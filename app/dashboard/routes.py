@@ -34,8 +34,12 @@ def get_index_page():
 
 @dashboard.route('/help', methods=['GET'])
 @login_required
-@roles_accepted('root')
+# @roles_accepted('root')
 def get_help():
+
+    if not current_user.has_role('root'):
+        abort(404)
+
     menu_list = [{
         'href': url_for('dashboard.get_user_page', id=current_user.id),
         'title': u'<< Назад'
@@ -50,6 +54,11 @@ def get_help():
 def get_user_page(id):
 
     if current_user.has_role('root'):
+
+        menu_list = [{
+            'href': url_for('dashboard.get_help', id=current_user.id),
+            'title': u'Справка'
+        }]
         
         users = User.query.all()
         parsers = Parser.query.all()
@@ -61,7 +70,7 @@ def get_user_page(id):
         # moderators_role = Role.query.filter_by(name='moderator').first()
         # moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
 
-        return render_template('common.html', users=users, parsers=parsers, clients=clients)
+        return render_template('common.html', users=users, parsers=parsers, clients=clients, menu_list=menu_list)
     
     elif current_user.has_role('admin'):
         users = User.query.filter_by(parent_id = current_user.id).all()
@@ -109,36 +118,28 @@ def get_parser_page(id):
 
 @dashboard.errorhandler(404)
 def not_found_error(error):
-    return render_template('404.html'), 404
+    menu_list = [{
+        'href': url_for('dashboard.get_user_page', id=current_user.id),
+        'title': u'<< Назад'
+    }]
+    return render_template('404.html', menu_list=menu_list), 404
 
 
 @dashboard.errorhandler(500)
 def internal_error(error):
+    menu_list = [{
+        'href': url_for('dashboard.get_user_page', id=current_user.id),
+        'title': u'<< Назад'
+    }]
     db.session.rollback()
-    return render_template('500.html'), 500
+    return render_template('500.html', menu_list=menu_list), 500
 
 
 
 #####################################################################################################
 #                                           DASH API                                                #
 #####################################################################################################
-
-# @dashboard.route('/dash/v1.0/test', methods=['GET', 'POST'])
-# @login_required
-# @roles_accepted('moderator', 'admin', 'root')
-# def test():
-#     if method == 'GET':
-#         return jsonify({
-#             'success': True,
-#             'method': 'get'
-#             })
-#     elif method == 'POST':
-#         return jsonify({
-#             'success': True,
-#             'method': 'post'
-#             })
     
-
 
 @dashboard.route('/dash/v1.0/add_user', methods=['POST'])
 @login_required
@@ -201,37 +202,84 @@ def add_user():
     return jsonify(api_resp)
 
 
-# TODO: Передалеать!
-# @dashboard.route('/dash/v1.0/del_user', methods=['POST'])
-# @login_required
-# @roles_accepted('root', 'admin')
-# def del_user():
 
-#     api_resp = {
-#         'url': '',     
-#         'method': '',                 
-#         'success': True,                 
-#         'resp_data': '',               
-#         'error': ''                
-#     }
+@dashboard.route('/dash/v1.0/del_user', methods=['POST'])
+@login_required
+@roles_accepted('root', 'admin')
+def del_user():
 
-#     user_id = request.form['id']
+    api_resp = {
+        'url': '',     
+        'method': '',                 
+        'success': True,                 
+        'resp_data': '',               
+        'error': ''                
+    }
 
-#     api_resp['url'] = '/dash/v1.0/del_user'
-#     api_resp['method'] = 'POST'
+    user_id = request.form['id']
 
+    api_resp['url'] = '/dash/v1.0/del_user'
+    api_resp['method'] = 'POST'
+
+    user = User.query.filter_by(id=user_id).first()
+
+    if user is None:
+        resp_data['error'] = 'Пользователь не найден в базе!'
+        return jsonify(api_resp)
+
+    if current_user.name != 'root' and user.parent_id != current_user.id:
+        resp_data['error'] = 'Ошибка удаления пользователя!'
+        return jsonify(api_resp)
     
-#     user = User.query.filter_by(id=user_id).first()
-#     if user and user.name != current_user.name:
-#         try:
-#             db.session.delete(user)
-#             db.session.commit()
-#             api_resp['success'] = True
-#         except:
-#             api_resp['success'] = False
-#             api_resp['error'] = 'Ошибка удаления пользователя!'
+    moderators = User.query.filter_by(parent_id=user.id).all()
+    if moderators:
+        for moderator in moderators:
+            clients = Client.query.filter_by(user_id=moderator.id).all()
+            if clients:
+                for client in clients:
+                    try:
+                        db.session.delete(client)
+                        db.session.commit()
+                    except:
+                        api_resp['error'] = 'Не удалось удалить клиентов удаляемого пользователя!'
+                        return jsonify(api_resp)
+            try:
+                db.session.delete(moderator)
+                db.session.commit()
+            except:
+                api_resp['error'] = 'Не удалось удалить засисимых пользователей удаляемого пользователя!'
+                return jsonify(api_resp)
+
+    parsers = Parser.query.filter_by(user_id=user.id).all()
+    if parsers:
+        for parser in user.parsers:
+            try:
+                db.session.delete(parser)
+                db.session.commit()
+            except:
+                api_resp['error'] = 'Не удалось удалить парсеры удаляемого пользователя!'
+                return jsonify(api_resp)
     
-#     return jsonify(api_resp)
+    clients = Client.query.filter_by(user_id=user.id).all()
+    if clients:
+        for client in clients:
+            try:
+                db.session.delete(client)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                api_resp['error'] = 'Ошибка удаления клиента удаляемого пользователя!'
+                return jsonify(api_resp)
+
+    try:
+        db.session.delete(user)
+        db.session.commit()
+        api_resp['success'] = True
+    except:
+        db.session.rollback()
+        api_resp['error'] = 'Ошибка удаления пользователя!'
+
+    return jsonify(api_resp)
 
 
 @dashboard.route('/dash/v1.0/activ_deactiv_user', methods=['POST'])
@@ -283,7 +331,6 @@ def add_parser():
         'error': ''                
     }
 
-
     parser_name = request.form['name']
 
     api_resp['url'] = '/dash/v1.0/add_parser'
@@ -332,7 +379,6 @@ def del_parser():
         'resp_data': '',               
         'error': ''                
     }
-
 
     parser_id = request.form['id']
 
@@ -493,120 +539,120 @@ def activ_deactiv_client():
     return jsonify(api_resp)
 
 
-@dashboard.route('/dash/v1.0/get_moderator_counters', methods=['GET'])
-@login_required
-@roles_required('moderator')
-def get_moderator_counters():
+# @dashboard.route('/dash/v1.0/get_moderator_counters', methods=['GET'])
+# @login_required
+# @roles_required('moderator')
+# def get_moderator_counters():
 
-    api_resp = {
-        'url': '',     
-        'method': '',                 
-        'success': True,                 
-        'resp_data': '',               
-        'error': ''                
-    }
+#     api_resp = {
+#         'url': '',     
+#         'method': '',                 
+#         'success': True,                 
+#         'resp_data': '',               
+#         'error': ''                
+#     }
 
-    api_resp['url'] = '/dash/v1.0/get_moderator_counters'
-    api_resp['method'] = 'GET'
+#     api_resp['url'] = '/dash/v1.0/get_moderator_counters'
+#     api_resp['method'] = 'GET'
 
-    try:
-        clients_count = current_user.get_client_count()
+#     try:
+#         clients_count = current_user.get_client_count()
        
-        resp_data = {
-            'clients_count': clients_count
-            }
+#         resp_data = {
+#             'clients_count': clients_count
+#             }
         
-        api_resp['data'] = resp_data
-        api_resp['success'] = True
+#         api_resp['data'] = resp_data
+#         api_resp['success'] = True
         
-    except Exception as err:
-        api_resp['success'] = False
-        api_resp['error'] = 'Response data error'
+#     except Exception as err:
+#         api_resp['success'] = False
+#         api_resp['error'] = 'Response data error'
 
-    return jsonify(api_resp)
+#     return jsonify(api_resp)
 
 
-@dashboard.route('/dash/v1.0/get_root_counters', methods=['GET'])
-@login_required
-@roles_required('root')
-def get_root_counters():
+# @dashboard.route('/dash/v1.0/get_root_counters', methods=['GET'])
+# @login_required
+# @roles_required('root')
+# def get_root_counters():
     
-    api_resp = {
-        'url': '',     
-        'method': '',                 
-        'success': True,                 
-        'resp_data': '',               
-        'error': ''                
-    }
+#     api_resp = {
+#         'url': '',     
+#         'method': '',                 
+#         'success': True,                 
+#         'resp_data': '',               
+#         'error': ''                
+#     }
 
-    api_resp['url'] = '/dash/v1.0/get_root_counters'
-    api_resp['method'] = 'GET'
+#     api_resp['url'] = '/dash/v1.0/get_root_counters'
+#     api_resp['method'] = 'GET'
     
-    try:
-        parsers_count = Parser.query.count()
-        moderators_role = Role.query.filter_by(name='moderator').first()
-        admins_role = Role.query.filter_by(name='admin').first()
-        admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
-        moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
-        clients_count = Client.query.count()
+#     try:
+#         parsers_count = Parser.query.count()
+#         moderators_role = Role.query.filter_by(name='moderator').first()
+#         admins_role = Role.query.filter_by(name='admin').first()
+#         admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
+#         moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
+#         clients_count = Client.query.count()
         
 
-        resp_data = {
-            'moderators_count': moderators_count,
-            'parsers_count': parsers_count,
-            'clients_count': clients_count,
-            'admins_count': admins_count
-        }
+#         resp_data = {
+#             'moderators_count': moderators_count,
+#             'parsers_count': parsers_count,
+#             'clients_count': clients_count,
+#             'admins_count': admins_count
+#         }
         
-        api_resp['data'] = resp_data
-        api_resp['success'] = True
+#         api_resp['data'] = resp_data
+#         api_resp['success'] = True
         
-    except Exception as err:
-        api_resp['success'] = False
-        api_resp['error'] = 'Ошибка получения счетчиков'
+#     except Exception as err:
+#         api_resp['success'] = False
+#         api_resp['error'] = 'Ошибка получения счетчиков'
 
-    return jsonify(api_resp)
-
-
+#     return jsonify(api_resp)
 
 
-@dashboard.route('/dash/v1.0/get_admin_counters', methods=['GET'])
-@login_required
-@roles_required('admin')
-def get_admin_counters():
+
+
+# @dashboard.route('/dash/v1.0/get_admin_counters', methods=['GET'])
+# @login_required
+# @roles_required('admin')
+# def get_admin_counters():
     
-    api_resp = {
-        'url': '',     
-        'method': '',                 
-        'success': True,                 
-        'resp_data': '',               
-        'error': ''                
-    }
+#     api_resp = {
+#         'url': '',     
+#         'method': '',                 
+#         'success': True,                 
+#         'resp_data': '',               
+#         'error': ''                
+#     }
 
-    api_resp['url'] = '/dash/v1.0/get_admin_counters'
-    api_resp['method'] = 'GET'
+#     api_resp['url'] = '/dash/v1.0/get_admin_counters'
+#     api_resp['method'] = 'GET'
     
-    try:
-        parsers_count = Parser.query.count()
-        moderators_role = Role.query.filter_by(name='moderator').first()
-        admins_role = Role.query.filter_by(name='admin').first()
-        admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
-        moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
-        clients_count = Client.query.count()
+#     try:
+#         parsers_count = Parser.query.count()
+#         moderators_role = Role.query.filter_by(name='moderator').first()
+#         admins_role = Role.query.filter_by(name='admin').first()
+#         admins_count = db.session.query(User).filter(User.roles.contains(admins_role)).count()
+#         moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
+#         clients_count = Client.query.count()
         
 
-        resp_data = {
-            'moderators_count': moderators_count,
-            'parsers_count': parsers_count,
-            'clients_count': clients_count,
-            'admins_count': admins_count
-        }
+#         resp_data = {
+#             'moderators_count': moderators_count,
+#             'parsers_count': parsers_count,
+#             'clients_count': clients_count,
+#             'admins_count': admins_count
+#         }
         
-        api_resp['data'] = resp_data
-        api_resp['success'] = True
+#         api_resp['data'] = resp_data
+#         api_resp['success'] = True
         
-    except Exception as err:
-        api_resp['success'] = False
-        api_resp['error'] = 'Ошибка получения счетчиков'
+#     except Exception as err:
+#         api_resp['success'] = False
+#         api_resp['error'] = 'Ошибка получения счетчиков'
 
-    return jsonify(api_resp)
+#     return jsonify(api_resp)
