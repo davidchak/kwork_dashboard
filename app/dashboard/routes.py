@@ -32,19 +32,6 @@ def get_index_page():
         return redirect(url_for('auth.login'))
 
 
-@dashboard.route('/help', methods=['GET'])
-@login_required
-# @roles_accepted('root')
-def get_help():
-
-    if not current_user.has_role('root'):
-        abort(404)
-
-    menu_list = [{
-        'href': url_for('dashboard.get_user_page', id=current_user.id),
-        'title': u'<< Назад'
-    }]
-    return render_template('help.html', menu_list=menu_list)
 
 
 # Страница пользоватлея
@@ -54,11 +41,6 @@ def get_help():
 def get_user_page(id):
 
     if current_user.has_role('root'):
-
-        menu_list = [{
-            'href': url_for('dashboard.get_help', id=current_user.id),
-            'title': u'Справка'
-        }]
         
         users = User.query.all()
         parsers = Parser.query.all()
@@ -70,7 +52,7 @@ def get_user_page(id):
         # moderators_role = Role.query.filter_by(name='moderator').first()
         # moderators_count = db.session.query(User).filter(User.roles.contains(moderators_role)).count()
 
-        return render_template('common.html', users=users, parsers=parsers, clients=clients, menu_list=menu_list)
+        return render_template('common.html', users=users, parsers=parsers, clients=clients)
     
     elif current_user.has_role('admin'):
         users = User.query.filter_by(parent_id = current_user.id).all()

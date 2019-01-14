@@ -50,7 +50,7 @@ def verify_password(username, password):
     user = User.query.filter_by(name=username).first()
     if user is not None and user.active and user.check_password(password):
         user._update_last_login_time(datetime.utcnow())
-        user._update_last_logout_time(datetime.urcnow() + timedelta(seconds=10))
+        user._update_last_logout_time(datetime.utcnow() + timedelta(seconds=60))
         g.user = user
         return True
     return False

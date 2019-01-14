@@ -23,11 +23,11 @@
             </thead>
             <tbody id="dc-users-table">
                 {% if parser_dict['data'] %}
-                {% for row in parser_dict['data'] %}
+                {% for index in range(1, parser_dict['data'] | length) %}
                 <tr>
-                    <th scope="row">{{ row['id'] }}</th>
-                    <td>{{ moment(row['datestamp']).fromat('LLLL') }}</td>
-                    <td>{{ row['json'] }}</td>
+                    <th scope="row">{{ index }}</th>
+                    <td>{{ moment(parser_dict['data'][index]['datestamp']).format('LLLL') }}</td>
+                    <td>{{ parser_dict['data'][index]['json'] }}</td>
                 </tr>
                 {% endfor %}
                 {% endif %}

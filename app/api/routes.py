@@ -247,10 +247,12 @@ def del_user():
 
     if data.has_key('id'):
         user = User.query.filter_by(id=data['id']).first()
-    elif data.has_key('token'):
-        user = User.query.filter_by(token=data['token']).first()
+    elif data.has_key('id'):
+        user = User.query.filter_by(name=data['name']).first()
     else:
+        resp_data['success'] = False
         resp_data['error'] = 'Необходимо передать параметр id или name!'
+        return jsonify(resp_data)
 
     # если пользователя в базе нет - ошибка
     if user is None:
@@ -395,6 +397,11 @@ def del_parser():
         parser = Parser.query.filter_by(id=data['id']).first()
     elif data.has_key('token'):
         parser = Parser.query.filter_by(token=data['token']).first()
+
+    if parser is None:
+        resp_data['success'] = False
+        resp_data['error'] = 'Парсер не обнаружен!'
+        return jsonify(resp_data)
     
     if parser.owner == g.user or g.user.has_role('root'): 
         try:
@@ -457,6 +464,11 @@ def add_client():
 
     data = request.json
 
+    if data is None:
+        resp_data['success'] = False
+        resp_data['error'] = 'Необходимо передать имя клиента параметром name'
+        return jsonify(resp_data)
+
     new_client = Client(name=data['name'])
     new_client.owner = g.user
     new_client.get_token()
@@ -486,17 +498,17 @@ def del_client():
 
     data = request.json
 
-    if data.has_key('name'):
-        new_client = Client.query.filter_by(name=data['name']).first()
+    if data.has_key('token'):
+        client = Client.query.filter_by(token=data['token']).first()
     elif data.has_key('id'):
-        new_client = Client.query.filter_by(id=data['id']).first()
+        client = Client.query.filter_by(id=data['id']).first()
 
-    if g.user.has_role('root') or g.user == new_client.owner or g.user == User.query.filter_by :
+    if not g.user.has_role('root') and g.user != client.owner:
         resp_data['error'] = 'Ошибка удаления клиента!'
         return jsonify(resp_data)
 
     try:
-        db.session.delete(new_client)
+        db.session.delete(client)
         db.session.commit()
         resp_data['success'] = True
     except:
@@ -520,24 +532,36 @@ def prolong_client_token():
 
     if not data.has_key('days'):
         resp_data['success'] = False
-        resp_data['error'] = 'Не указано количество дней для продления!'
+        resp_data['error'] = '1. Не указано количество дней для продления!'
         return jsonify(resp_data)
 
     if data.has_key('id'):
         client = Client.query.filter_by(id=data['id']).first()
     elif data.has_key('token'):
         client = Client.query.filter_by(token=data['token']).first()
+    else:
+        resp_data['success'] = False
+        resp_data['error'] = '2. Необходиме передать id или token клиента!'
+        return jsonify(resp_data)
 
-    if g.user.has_role('root') or g.user == client.owner:
+    if client is None:
+        resp_data['success'] = False
+        resp_data['error'] = '3. Объект не найден!'
+        return jsonify(resp_data)
+
+    if not g.user.has_role('root') and client.owner != g.user:
+        resp_data['success'] = False
+        resp_data['error'] = '4. Нужно быть владельцем или root для удаления!'
+        return jsonify(resp_data)
         
-        try:
-            client.update_token_expiration(data['days'])
-            db.session.commit()
-            resp_data['success'] = True
-            resp_data['data'] = client.to_dict()
-        except:
-            resp_data['success'] = True
-            resp_data['error'] = 'Ошибка продления токена клиента!'
-            return jsonify(resp_data)
-    
+    try:
+        client.update_token_expiration(int(data['days']))
+        db.session.commit()
+        resp_data['data'] = client.to_dict()
+        resp_data['success'] = True
+    except:
+        resp_data['success'] = False
+        resp_data['error'] = '5. Ошибка продления токена клиента!'
+        return jsonify(resp_data)
+
     return jsonify(resp_data)
